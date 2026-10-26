@@ -1,0 +1,154 @@
+{
+  "cloud_mode": true,
+  "captured_at": "2026-10-26T23:29:43.681639+00:00",
+  "home": {
+    "headline": "Public investigation copy",
+    "summary": "Published investigation snapshot captured 2026-10-26T23:29:43.681639+00:00. This cloud copy does not run the local Python engine or worker.",
+    "counts": {
+      "seeds_loaded": 2,
+      "source_records_validated": 43801,
+      "forecasts_generated": 161,
+      "forecasts_settled": 0,
+      "learning_updates": 0,
+      "candidates_tested": 0
+    },
+    "worker": {
+      "label": "Snapshot only",
+      "detail": "The operational V3 engine remains on the owner’s PC. This hosted copy exposes the interface and reviewed source code."
+    },
+    "last_real": {},
+    "next": {
+      "label": "Inspect the public source or test the interface",
+      "reason": "Local learning and paired evaluation wait for verified whole-week finality. Public source: /source/index.html"
+    },
+    "primary_action": {
+      "label": "Local operations are unavailable in this copy",
+      "enabled": false,
+      "reason": "No private engine, data, credentials or control connection is hosted."
+    },
+    "performance": {
+      "summary": "Not measured yet",
+      "reason": "No private forecast, outcome or betting records are publicly redistributed.",
+      "metrics": []
+    }
+  },
+  "overview": {
+    "status": "PUBLIC_READ_ONLY_INVESTIGATION",
+    "genuine_roi": "ROI_NOT_ESTABLISHED",
+    "production_model": "UNVERIFIED",
+    "provider_access": "DISABLED"
+  },
+  "function_status": [
+    {
+      "id": "forecast",
+      "label": "Forecasting",
+      "status": "LOCAL_ONLY",
+      "summary": "Individual private predictions are omitted from the public export."
+    }
+  ],
+  "attention": [
+    {
+      "id": "cloud-scope",
+      "title": "The hosted copy is for interface and code investigation",
+      "summary": "Published investigation snapshot captured 2026-10-26T23:29:43.681639+00:00. This cloud copy does not run the local Python engine or worker. Full cloud V3 execution requires a separate Python-capable host with private storage and admitted engine/data access.",
+      "status": "OPEN",
+      "owner_required": false,
+      "blocks": [
+        "Cloud V3 execution"
+      ],
+      "source": "Hosting capability",
+      "resolution_kind": "hosting"
+    },
+    {
+      "id": "whole-week",
+      "title": "Local settlement waits for verified complete Week 7",
+      "summary": "The live run verified new player statistics and play-by-play, but still lacked the final DAL–PHI game-end marker at capture. Scheduled kickoff is not completion.",
+      "status": "OPEN",
+      "owner_required": false,
+      "blocks": [
+        "Local whole-week learning and paired comparison"
+      ],
+      "source": "Verified local execution receipt"
+    }
+  ],
+  "coverage_audits": [
+    {
+      "total": 783,
+      "eligible": 161,
+      "excluded": 622,
+      "reasons": {
+        "TOO_FEW_SAME_TEAM_APPEARANCES": 14,
+        "UNRESOLVED_PRIOR_PARTICIPATION": 598,
+        "UNRESOLVED_PRIOR_ROSTER_MEMBERSHIP": 10
+      },
+      "cohorts": [
+        {
+          "candidates": 82,
+          "channel": "receiving",
+          "cohort": "higher_prior_usage",
+          "eligible": 57,
+          "excluded": 25
+        },
+        {
+          "candidates": 266,
+          "channel": "receiving",
+          "cohort": "other_known_prior_usage",
+          "eligible": 67,
+          "excluded": 199
+        },
+        {
+          "candidates": 262,
+          "channel": "receiving",
+          "cohort": "unknown",
+          "eligible": 0,
+          "excluded": 262
+        },
+        {
+          "candidates": 33,
+          "channel": "rushing",
+          "cohort": "higher_prior_usage",
+          "eligible": 21,
+          "excluded": 12
+        },
+        {
+          "candidates": 68,
+          "channel": "rushing",
+          "cohort": "other_known_prior_usage",
+          "eligible": 16,
+          "excluded": 52
+        },
+        {
+          "candidates": 72,
+          "channel": "rushing",
+          "cohort": "unknown",
+          "eligible": 0,
+          "excluded": 72
+        }
+      ],
+      "denominator": "Channel-applicable roster decisions only. Non-RB/FB rushing combinations were never in the 783 candidate denominator.",
+      "input_equivalence": "NOT_ESTABLISHED: snaps unknown and older source history omitted. The 228 column count is not an input-equivalence or forecast-quality certificate."
+    }
+  ],
+  "candidate_decisions": [],
+  "forecasts": [],
+  "performance": [],
+  "experiments": [],
+  "experiment_results": [],
+  "knowledge": [],
+  "knowledge_sources": [],
+  "models": [],
+  "leaderboard": [],
+  "alerts": [],
+  "sources": [],
+  "integrations": [],
+  "packages": [],
+  "jobs": [],
+  "settings": {},
+  "receipts": [],
+  "bets": [],
+  "ledger": {
+    "REAL": null,
+    "PAPER": null
+  },
+  "runtime": {}
+}

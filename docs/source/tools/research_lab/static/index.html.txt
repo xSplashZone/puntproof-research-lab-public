@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>PuntProof · Research Lab</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="masthead">
+    <a class="brand" href="#home" aria-label="PuntProof Research Lab home"><span class="brand-mark">P</span><span>PuntProof<small>Research Lab</small></span></a>
+    <nav id="navigation" aria-label="Main navigation"></nav>
+    <div class="header-tools"><button id="refresh" class="icon-button" aria-label="Refresh the current view" title="Refresh the current view">↻</button><button id="settings-link" class="secondary-button">Settings</button></div>
+  </header>
+  <div class="app-shell">
+    <main id="main" tabindex="-1">
+      <div class="page-heading"><div><div class="eyebrow" id="crumb">Your Research Lab</div><h1 id="page-title">Home</h1><p id="page-description">Checking your latest progress.</p></div><div id="page-actions" class="heading-actions"></div></div>
+      <div id="notice" class="notice" role="status" hidden></div>
+      <div id="status-banner" role="status"></div>
+      <section id="content" aria-live="polite" aria-busy="true"><div class="loading-state"><span class="loading-indicator" aria-hidden="true"></span><h2>Loading your Research Lab</h2><p>Reading saved progress and the current worker state.</p></div></section>
+      <footer><span id="connection">Connecting to the local service…</span><span id="last-refresh">Waiting for the first update</span><span id="clock"></span></footer>
+    </main>
+  </div>
+  <dialog id="detail" aria-labelledby="detail-title"><div class="dialog-heading"><div><div class="eyebrow" id="detail-label">Details</div><h2 id="detail-title">Details</h2></div><button id="close-detail" class="icon-button" aria-label="Close details">×</button></div><div id="detail-body"></div><div id="detail-actions" class="dialog-actions"></div></dialog>
+</body>
+</html>
