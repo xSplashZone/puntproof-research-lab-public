@@ -458,7 +458,8 @@
           "status": "PREFLIGHT_FAILED",
           "elapsed_seconds": 0.0,
           "phase": "PLANNED",
-          "result": null
+          "result": null,
+          "error": "Duplicate numerical inputs skipped before fitting; source custody metadata alone changed."
         },
         {
           "id": "aggregate-8",
@@ -471,7 +472,8 @@
           "status": "PREFLIGHT_FAILED",
           "elapsed_seconds": 0.0,
           "phase": "PLANNED",
-          "result": null
+          "result": null,
+          "error": "Duplicate numerical inputs skipped before fitting; source custody metadata alone changed."
         }
       ],
       "runtime": {
