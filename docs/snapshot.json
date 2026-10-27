@@ -1,16 +1,16 @@
 {
   "cloud_mode": true,
-  "captured_at": "2026-10-26T23:29:43.681639+00:00",
+  "captured_at": "2026-10-27T08:22:58.128782+00:00",
   "home": {
     "headline": "Public investigation copy",
-    "summary": "Published investigation snapshot captured 2026-10-26T23:29:43.681639+00:00. This cloud copy does not run the local Python engine or worker.",
+    "summary": "Published investigation snapshot captured 2026-10-27T08:22:58.128782+00:00. This cloud copy does not run the local Python engine or worker.",
     "counts": {
       "seeds_loaded": 2,
-      "source_records_validated": 43801,
+      "source_records_validated": 44048,
       "forecasts_generated": 161,
-      "forecasts_settled": 0,
-      "learning_updates": 0,
-      "candidates_tested": 0
+      "forecasts_settled": 146,
+      "learning_updates": 1,
+      "candidates_tested": 2
     },
     "worker": {
       "label": "Snapshot only",
@@ -19,7 +19,7 @@
     "last_real": {},
     "next": {
       "label": "Inspect the public source or test the interface",
-      "reason": "Local learning and paired evaluation wait for verified whole-week finality. Public source: /source/index.html"
+      "reason": "This snapshot reports saved completed work at capture. Public source: /source/index.html"
     },
     "primary_action": {
       "label": "Local operations are unavailable in this copy",
@@ -27,7 +27,7 @@
       "reason": "No private engine, data, credentials or control connection is hosted."
     },
     "performance": {
-      "summary": "Not measured yet",
+      "summary": "See private local measured results",
       "reason": "No private forecast, outcome or betting records are publicly redistributed.",
       "metrics": []
     }
@@ -50,7 +50,7 @@
     {
       "id": "cloud-scope",
       "title": "The hosted copy is for interface and code investigation",
-      "summary": "Published investigation snapshot captured 2026-10-26T23:29:43.681639+00:00. This cloud copy does not run the local Python engine or worker. Full cloud V3 execution requires a separate Python-capable host with private storage and admitted engine/data access.",
+      "summary": "Published investigation snapshot captured 2026-10-27T08:22:58.128782+00:00. This cloud copy does not run the local Python engine or worker. Full cloud V3 execution requires a separate Python-capable host with private storage and admitted engine/data access.",
       "status": "OPEN",
       "owner_required": false,
       "blocks": [
@@ -58,17 +58,6 @@
       ],
       "source": "Hosting capability",
       "resolution_kind": "hosting"
-    },
-    {
-      "id": "whole-week",
-      "title": "Local settlement waits for verified complete Week 7",
-      "summary": "The live run verified new player statistics and play-by-play, but still lacked the final DAL–PHI game-end marker at capture. Scheduled kickoff is not completion.",
-      "status": "OPEN",
-      "owner_required": false,
-      "blocks": [
-        "Local whole-week learning and paired comparison"
-      ],
-      "source": "Verified local execution receipt"
     }
   ],
   "coverage_audits": [
@@ -150,5 +139,359 @@
     "REAL": null,
     "PAPER": null
   },
-  "runtime": {}
+  "runtime": {},
+  "gamd": {
+    "completed": 9,
+    "fitted_artifacts": 14,
+    "failed": 1,
+    "rejected": 2,
+    "attempts": [],
+    "continuous": {
+      "attempts": [
+        {
+          "id": "aggregate-1",
+          "plan": {
+            "template_id": "individual_context_receiving",
+            "process": "EXPERIMENTAL_DEVELOPMENT",
+            "family": "hist_gradient_boosting",
+            "channel": "receiving"
+          },
+          "status": "COMPLETED",
+          "elapsed_seconds": 34.72966080001788,
+          "phase": "EVALUATION_OPENED",
+          "result": {
+            "metrics": {
+              "n": 3340,
+              "mae": 18.183429234042116,
+              "crps": 13.053080711906846,
+              "coverage80": 0.807185628742515,
+              "interval80_width": 56.64640718562874,
+              "median_mae": 17.720958083832336,
+              "threshold_brier": 0.11597036547459087
+            },
+            "matched_candidate_metrics": {
+              "n": 3340,
+              "mae": 18.183429234042116,
+              "crps": 13.053080711906846,
+              "coverage80": 0.807185628742515,
+              "interval80_width": 56.64640718562874,
+              "median_mae": 17.720958083832336,
+              "threshold_brier": 0.11597036547459087
+            },
+            "completed_folds": 1,
+            "probability_status": "EXPERIMENTAL_UNVALIDATED",
+            "classification": "EXPOSED_REVISED_HISTORY_DEVELOPMENT",
+            "frozen_controls": {
+              "same_population_n": 3301,
+              "candidate": {
+                "n": 3301,
+                "mae": 18.228822842196315,
+                "crps": 13.096224457512447,
+                "coverage80": 0.8061193577703726,
+                "interval80_width": 56.74219933353529,
+                "median_mae": 17.783398970009088,
+                "threshold_brier": 0.11622102652410028
+              },
+              "F": {
+                "n": 3301,
+                "mae": 17.609018433162472,
+                "crps": 12.529686708155635,
+                "coverage80": 0.8679188124810664,
+                "interval80_width": 56.002120569524386,
+                "median_mae": 17.655558921538926,
+                "threshold_brier": 0.11086739615504217
+              },
+              "B": {
+                "n": 3301,
+                "mae": 18.152411499467306,
+                "crps": 13.67188758987052,
+                "coverage80": 0.7364435019691002,
+                "interval80_width": 47.720084822780976,
+                "median_mae": 18.7494698576189,
+                "threshold_brier": 0.12088972348633735
+              }
+            }
+          }
+        },
+        {
+          "id": "aggregate-2",
+          "plan": {
+            "template_id": "individual_context_rushing",
+            "process": "EXPERIMENTAL_DEVELOPMENT",
+            "family": "hist_gradient_boosting",
+            "channel": "rushing"
+          },
+          "status": "REJECTED",
+          "elapsed_seconds": 32.771808699995745,
+          "phase": "EVALUATION_OPENED",
+          "result": {
+            "metrics": {
+              "n": 1003,
+              "mae": 22.39820484415982,
+              "crps": 16.060795167497414,
+              "coverage80": 0.8015952143569293,
+              "interval80_width": 68.54735792622134,
+              "median_mae": 22.057826520438685,
+              "threshold_brier": 0.1309766417543622
+            },
+            "matched_candidate_metrics": {
+              "n": 1003,
+              "mae": 22.39820484415982,
+              "crps": 16.060795167497414,
+              "coverage80": 0.8015952143569293,
+              "interval80_width": 68.54735792622134,
+              "median_mae": 22.057826520438685,
+              "threshold_brier": 0.1309766417543622
+            },
+            "completed_folds": 1,
+            "probability_status": "EXPERIMENTAL_UNVALIDATED",
+            "classification": "EXPOSED_REVISED_HISTORY_DEVELOPMENT",
+            "frozen_controls": {
+              "same_population_n": 999,
+              "candidate": {
+                "n": 999,
+                "mae": 22.29986782418462,
+                "crps": 15.96432838432111,
+                "coverage80": 0.8018018018018018,
+                "interval80_width": 68.62162162162163,
+                "median_mae": 21.963963963963963,
+                "threshold_brier": 0.13064999605852892
+              },
+              "F": {
+                "n": 999,
+                "mae": 21.228678742901668,
+                "crps": 14.797031241255599,
+                "coverage80": 0.8078078078078078,
+                "interval80_width": 63.88488488488488,
+                "median_mae": 20.95995995995996,
+                "threshold_brier": 0.12187117308348387
+              },
+              "B": {
+                "n": 999,
+                "mae": 21.437342387900785,
+                "crps": 16.061070963910666,
+                "coverage80": 0.6866866866866866,
+                "interval80_width": 55.8958958958959,
+                "median_mae": 22.416416416416418,
+                "threshold_brier": 0.13340745695127246
+              }
+            }
+          }
+        },
+        {
+          "id": "aggregate-3",
+          "plan": {
+            "template_id": "extra_trees_conditional_receiving",
+            "process": "EXPERIMENTAL_DEVELOPMENT",
+            "family": "extra_trees",
+            "channel": "receiving"
+          },
+          "status": "COMPLETED",
+          "elapsed_seconds": 43.190922099980526,
+          "phase": "EVALUATION_OPENED",
+          "result": {
+            "metrics": {
+              "n": 3340,
+              "mae": 17.962525508494792,
+              "crps": 12.986569154168466,
+              "coverage80": 0.8146706586826348,
+              "interval80_width": 56.7814371257485,
+              "median_mae": 17.49940119760479,
+              "threshold_brier": 0.11440192446074271
+            },
+            "matched_candidate_metrics": {
+              "n": 3340,
+              "mae": 17.962525508494792,
+              "crps": 12.986569154168466,
+              "coverage80": 0.8146706586826348,
+              "interval80_width": 56.7814371257485,
+              "median_mae": 17.49940119760479,
+              "threshold_brier": 0.11440192446074271
+            },
+            "completed_folds": 1,
+            "probability_status": "EXPERIMENTAL_UNVALIDATED",
+            "classification": "EXPOSED_REVISED_HISTORY_DEVELOPMENT",
+            "frozen_controls": {
+              "same_population_n": 3301,
+              "candidate": {
+                "n": 3301,
+                "mae": 18.007232168305105,
+                "crps": 13.02962863881575,
+                "coverage80": 0.8133898818539836,
+                "interval80_width": 56.86610118146017,
+                "median_mae": 17.560436231445017,
+                "threshold_brier": 0.11464433131571478
+              },
+              "F": {
+                "n": 3301,
+                "mae": 17.609018433162472,
+                "crps": 12.529686708155635,
+                "coverage80": 0.8679188124810664,
+                "interval80_width": 56.002120569524386,
+                "median_mae": 17.655558921538926,
+                "threshold_brier": 0.11086739615504217
+              },
+              "B": {
+                "n": 3301,
+                "mae": 18.152411499467306,
+                "crps": 13.67188758987052,
+                "coverage80": 0.7364435019691002,
+                "interval80_width": 47.720084822780976,
+                "median_mae": 18.7494698576189,
+                "threshold_brier": 0.12088972348633735
+              }
+            }
+          }
+        },
+        {
+          "id": "aggregate-4",
+          "plan": {
+            "template_id": "linked_receiving_hurdle_recovery",
+            "process": "LINKED_PREFIT_ENGINEERING_RECOVERY",
+            "family": "hurdle_glm",
+            "channel": "receiving"
+          },
+          "status": "COMPLETED",
+          "elapsed_seconds": 39.48392890000832,
+          "phase": "FIT_COMPLETED",
+          "result": {
+            "metrics": {
+              "n": 9187,
+              "mae": 18.051314356582843,
+              "crps": 12.874037498629095,
+              "coverage80": 0.8222488298682922,
+              "interval80_width": 54.784804615217155,
+              "median_mae": 17.450527919886795,
+              "threshold_brier": 0.11438173574295073
+            },
+            "matched_candidate_metrics": {
+              "n": 8616,
+              "mae": 18.318643636649817,
+              "crps": 13.108286519634879,
+              "coverage80": 0.8148792943361188,
+              "interval80_width": 54.950789229340764,
+              "median_mae": 17.76775766016713,
+              "threshold_brier": 0.11574442768786997
+            },
+            "completed_folds": 2,
+            "probability_status": "EXPERIMENTAL_UNVALIDATED",
+            "classification": "LINKED_PREFIT_ENGINEERING_RECOVERY_THEN_EXPOSED_DEVELOPMENT",
+            "frozen_controls": {
+              "same_population_n": null,
+              "candidate": {},
+              "F": {},
+              "B": {}
+            }
+          }
+        },
+        {
+          "id": "aggregate-5",
+          "plan": {
+            "template_id": "scheduled_refit_receiving",
+            "process": "SCHEDULED_REFIT",
+            "family": "hist_gradient_boosting",
+            "channel": "receiving"
+          },
+          "status": "INCONCLUSIVE",
+          "elapsed_seconds": 33.51829770000768,
+          "phase": "FIT_COMPLETED",
+          "result": {
+            "metrics": {},
+            "matched_candidate_metrics": {},
+            "completed_folds": 0,
+            "probability_status": "EXPERIMENTAL_UNVALIDATED",
+            "classification": "SCHEDULED_PAST_DATA_REFIT_NO_TEST_RESULTS",
+            "frozen_controls": {
+              "same_population_n": null,
+              "candidate": {},
+              "F": {},
+              "B": {}
+            }
+          }
+        },
+        {
+          "id": "aggregate-6",
+          "plan": {
+            "template_id": "scheduled_refit_rushing",
+            "process": "SCHEDULED_REFIT",
+            "family": "hist_gradient_boosting",
+            "channel": "rushing"
+          },
+          "status": "INCONCLUSIVE",
+          "elapsed_seconds": 27.226832699991064,
+          "phase": "FIT_COMPLETED",
+          "result": {
+            "metrics": {},
+            "matched_candidate_metrics": {},
+            "completed_folds": 0,
+            "probability_status": "EXPERIMENTAL_UNVALIDATED",
+            "classification": "SCHEDULED_PAST_DATA_REFIT_NO_TEST_RESULTS",
+            "frozen_controls": {
+              "same_population_n": null,
+              "candidate": {},
+              "F": {},
+              "B": {}
+            }
+          }
+        },
+        {
+          "id": "aggregate-7",
+          "plan": {
+            "template_id": "scheduled_refit_receiving",
+            "process": "SCHEDULED_REFIT",
+            "family": "hist_gradient_boosting",
+            "channel": "receiving"
+          },
+          "status": "PREFLIGHT_FAILED",
+          "elapsed_seconds": 0.0,
+          "phase": "PLANNED",
+          "result": null
+        },
+        {
+          "id": "aggregate-8",
+          "plan": {
+            "template_id": "scheduled_refit_rushing",
+            "process": "SCHEDULED_REFIT",
+            "family": "hist_gradient_boosting",
+            "channel": "rushing"
+          },
+          "status": "PREFLIGHT_FAILED",
+          "elapsed_seconds": 0.0,
+          "phase": "PLANNED",
+          "result": null
+        }
+      ],
+      "runtime": {
+        "status": "PUBLIC_SNAPSHOT",
+        "next_action": "Read-only capture. Local work continues separately."
+      },
+      "budget": {},
+      "processes": {
+        "B": "VERSIONED_MODEL_SAVED_AWAITING_FUTURE_EVALUATION"
+      },
+      "forward": {
+        "status": "SEALED_PREGAME",
+        "games": 1,
+        "forecasts": 39,
+        "targets": 39,
+        "exclusions": 31
+      },
+      "source": {
+        "summary": {
+          "fixed_prior_usage_eligible": 83,
+          "fixed_prior_usage_n": 115,
+          "gamd_supported": 451,
+          "new_eligible": 244,
+          "original_decisions": 783,
+          "original_issued": 161,
+          "previous_eligible": 184,
+          "priority_cases": 65,
+          "priority_missing_fields": 392,
+          "priority_repaired_fields": 392,
+          "verified_offered_prop_population": null
+        }
+      },
+      "paused": true
+    }
+  }
 }

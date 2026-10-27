@@ -9,3 +9,7 @@ class PublicExportTests(unittest.TestCase):
     def test_unknown_performance_stays_unmeasured(self):
         result=m.public_state({'home':{'counts':{}}},'authored')
         self.assertEqual(result['overview']['genuine_roi'],'ROI_NOT_ESTABLISHED');self.assertIn('Not measured',result['home']['performance']['summary'])
+
+    def test_current_settlement_has_no_stale_finality_claim(self):
+        result=m.public_state({'home':{'counts':{'forecasts_settled':146,'learning_updates':1}},'gamd':{'continuous':{'attempts':[{'plan':{'template_id':'fixed','process':'SCHEDULED_REFIT','projection':{'path':'DO_NOT_EXPORT'}},'result':{'metrics':None,'model':{'path':'DO_NOT_EXPORT'}}}]}}},'authored')
+        raw=json.dumps(result);self.assertNotIn('DO_NOT_EXPORT',raw);self.assertNotIn('lacked the final DAL',raw);self.assertEqual(result['home']['counts']['learning_updates'],1)

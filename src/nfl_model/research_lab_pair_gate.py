@@ -8,7 +8,7 @@ RECIPES=('SEALED_EXPERT1_ONLY','SEALED_EXPERT2_ONLY')
 
 def validate_pair_manifest(root,consumer,consumer_ref,manifest_ref):
     root=Path(root).resolve()
-    g.need(consumer_ref['path']==g.RUNTIME_CONSUMERS[g.DEVELOPMENT],'PAIRED_CONSUMER_REQUIRED')
+    g.need(consumer_ref['path'] in (g.RUNTIME_CONSUMERS[g.DEVELOPMENT],'research/research_lab_v1/continuous_compat_v3/DEVELOPMENT_CONSUMER.json','research/research_lab_v1/continuous_compat_v4/DEVELOPMENT_CONSUMER.json'),'PAIRED_CONSUMER_REQUIRED')
     pref=consumer.get('automatic_paired_policy',{})
     g.need(pref.get('path')==POLICY,'PAIRED_POLICY_REQUIRED')
     policy=g.value(root,pref,committed=True)

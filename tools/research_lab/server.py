@@ -11,6 +11,7 @@ from pathlib import Path
 import secrets
 import sys
 import threading
+import time
 from urllib.parse import urlsplit, unquote
 
 HERE = Path(__file__).resolve().parent
@@ -24,6 +25,46 @@ from worker import Worker
 REPO = HERE.parents[1]
 DEFAULT_DATA = REPO/"data/private/research-lab"
 
+def coverage_display_record(record, *, include_rows=True):
+    """Present every decision without duplicating its complete source provenance.
+
+    The stored record and CSV/JSON exports are unchanged. Exact missing-game
+    identities remain searchable here; source chains stay in the full export.
+    """
+    from gamd.coverage import runtime_summary
+    result = runtime_summary(record)
+    for key in ('id', 'revision', 'record_hash', 'recorded_at'):
+        if key in record:
+            result[key] = record[key]
+    result['display_only'] = True
+    result['full_evidence_in_export'] = True
+    if not include_rows:
+        return result
+    fields = ('season', 'week', 'game_id', 'gsis', 'name', 'team', 'position', 'opponent',
+              'channel', 'frozen_decision', 'frozen_reason', 'source_repaired_reason',
+              'source_repaired_eligible', 'frozen_eligibility_changed', 'category', 'priority',
+              'recovered_unknown_games', 'challenger_cohort', 'challenger_source_supported',
+              'challenger_current_model_admission', 'pregame_active_verified', 'offered_prop',
+              'current_availability', 'classification')
+    counts = ('prior_rows', 'verified_appearances', 'unknown_appearances', 'explicit_dnp',
+              'channel_supported_appearances', 'prior_usage_mean', 'prior_usage_cases')
+    identity = ('season', 'week', 'game_id', 'team', 'appeared', 'state')
+    rows = []
+    for original in record.get('rows', []):
+        row = {key: original[key] for key in fields if key in original}
+        for stage in ('before', 'after'):
+            history = original.get(stage, {})
+            row[stage] = {key: history[key] for key in counts if key in history}
+            for games in ('verified_games', 'unknown_games', 'dnp_games'):
+                row[stage][games] = [{key: game.get(key) for key in identity}
+                                     for game in history.get(games, [])]
+        row['other_team_history'] = [{key: game.get(key) for key in identity}
+                                     for game in original.get('other_team_history', [])]
+        rows.append(row)
+    result['rows'] = rows
+    return result
+
+
 class Application:
     def __init__(self, data_root, source_repo, starter_root, *, start_worker=True):
         self.store = Store(data_root)
@@ -31,6 +72,8 @@ class Application:
         self.starter_root = Path(starter_root).resolve()
         self.cookie_token, self.csrf = secrets.token_urlsafe(32), secrets.token_urlsafe(32)
         self.worker = Worker(self.store, self.source_repo)
+        from gamd.runtime import Coordinator
+        self.gamd = Coordinator(self.store,self.worker)
         self.stop_callback = None
         seed_knowledge(self.store)
         try:
@@ -55,6 +98,7 @@ class Application:
         self.store.audit("application_started", {"source_repo":str(self.source_repo),"providers_enabled":False})
         if start_worker:
             self.worker.start()
+            self.gamd.start()
 
     def state(self):
         s = self.store
@@ -93,8 +137,15 @@ class Application:
             "source_readiness":readiness.get("status","NOT_CHECKED"),"cycle_status":runtime["status"]
         }
         from app_view import owner_state
+        from game_shadow import observation_views
+        from gamd.forward import status as gamd_forward_status
+        gamd_status = self.gamd.status()
+        gamd_status['coverage'] = [coverage_display_record(record) for record in gamd_status.get('coverage', [])]
+        if isinstance(settings.get('gamd_coverage_runtime'), dict):
+            settings['gamd_coverage_runtime'] = coverage_display_record(settings['gamd_coverage_runtime'], include_rows=False)
+        gamd_status["forward"] = gamd_forward_status(REPO,s)
         return redact({**owner_state(s,runtime),"overview":overview,"models":models,"leaderboard":comparisons,
-                       "forecasts":s.records("forecast"), "coverage_audits":s.records("coverage_audit"), "candidate_decisions":s.records("candidate_decision"), "automation":s.get_setting("automation_status",{}), "ledger":accounting(s.bets()),
+                       "gamd":gamd_status, "continuous_benchmarks":s.records("continuous_benchmark"), "continuous_evaluations":s.records("continuous_evaluation"), "game_observations":observation_views(s,REPO), "forecasts":s.records("forecast"), "coverage_audits":s.records("coverage_audit"), "candidate_decisions":s.records("candidate_decision"), "automation":s.get_setting("automation_status",{}), "ledger":accounting(s.bets()),
                        "bets":s.bets(),"experiments":s.records("experiment"),"alerts":alerts,
                        "knowledge":s.records("knowledge"),"knowledge_sources":s.records("knowledge_source"),
                        "sources":sources,"integrations":s.records("integration"),"packages":s.records("package"),
@@ -103,10 +154,14 @@ class Application:
     def action(self, body):
         action = body.get("action")
         s = self.store
+        if action == "gamd_run_ready":
+            self.gamd.wake(force_idle=True)
+            return {"status":"REQUESTED","message":"Only the next admitted unconsumed GAMD recipe may run; current source and resource gates still apply."}
         if action in ("pause","resume"):
             s.set_setting("worker_paused",action=="pause")
             s.audit(action,{"target":"research_lab_worker"})
             self.worker.wake()
+            self.gamd.wake()
             return {"status":"PAUSED" if action=="pause" else "RESUMED"}
         if action == "run_ready":
             # Keep the queued request and its one-shot idle override atomic with
@@ -222,6 +277,17 @@ class LabServer(ThreadingHTTPServer):
         self.application=application
         super().__init__(address,Handler)
         application.stop_callback=self.shutdown
+        self.last_observation_check=0.
+
+    def service_actions(self):
+        # Output reporting only; the existing single worker owns all source/model work.
+        if time.monotonic()-self.last_observation_check<60:return
+        self.last_observation_check=time.monotonic()
+        try:
+            from game_shadow import refresh_evaluations
+            refresh_evaluations(self.application.store,REPO)
+        except (OSError,ValueError,KeyError,TypeError) as error:
+            self.application.store.alert('GAME_OBSERVATION_REPORT','P1','Game observation report needs investigation',{'reason':type(error).__name__,'next_action':'Inspect the sealed game manifest and completed whole-week score custody; do not rerun forecasts.'},'game-observation')
 
 class Handler(BaseHTTPRequestHandler):
     server_version="PuntProofResearchLab/1"
@@ -358,6 +424,7 @@ def main():
     try:
         server.serve_forever(poll_interval=.5)
     finally:
+        app.gamd.stop()
         app.worker.stop()
         server.server_close()
 

@@ -33,6 +33,15 @@ def producer_witness(snapshot, rule):
             'metadata_database':rule['metadata_database'],'snapshot_id':snapshot['id'],
             'row':snapshot['metadata_row']}
 
+def retained_settlement_clock(proof_path,inputs,proposed):
+    """Reuse time for an unchanged immutable proof; recomputation must still match bytes."""
+    if not proof_path.exists():return proposed
+    prior=json.loads(proof_path.read_bytes())
+    if prior.get('source_inputs')!=inputs:raise ValueError('SETTLEMENT_PROOF_SOURCE_IDENTITY')
+    retained=prior['source_observed_at']
+    if adapter.instant(retained)>adapter.instant(proposed):raise ValueError('SETTLEMENT_PROOF_FUTURE_CLOCK')
+    return retained
+
 class Operations:
     def __init__(self,store,source_repo,root=None):
         self.store=store
@@ -328,14 +337,16 @@ class Operations:
         if missing:return {'status':'WAITING','reason':'Missing verified Week '+str(target[1])+' '+', '.join(missing)+'.','missing':missing,'period':target}
         inputs=[r['artifact'] for r in imports.values()]
         identity=digest({'inputs':inputs,'forecast':active['manifest']})
+        directory=self.store.root/'sources'/('completion-'+identity[:24])
         mr,rr=self._plan('PREPARE_FORECAST',gate.SOURCE,target[1],
             {'population':'Post-seal target-week completion and exact issued player outcomes','records':sum(r['rows'] for r in imports.values())},
             inputs=inputs,identity=identity)
         with gate.execution_authority(self.root,gate.SOURCE,mr,rr,capability='PREPARE_FORECAST'):
             sources={s:gate.value(self.root,r['artifact'])['records'] for s,r in imports.items()}
             issued=[f for f in self.store.records('forecast') if f.get('manifest')==active['manifest']]
+            observation=retained_settlement_clock(directory/'SOURCE_PROOF.json',inputs,now())
             result=adapter.prepare_retained_settlement(sources['schedule'],sources['rosters'],sources['player_stats'],sources['pbp'],issued,
-                     target_period=tuple(target),observed_at=now())
+                     target_period=tuple(target),observed_at=observation)
         if result['status']!='VERIFIED_COMPLETE':return result
         if any(not any(row['status']=='APPEARED' for row in result['outcomes'].get(c,[])) for c in CHANNELS):
             return {'status':'WAITING','reason':'Both channels require actual verified appeared-player outcomes before advancing; unresolved participation is not zero.'}
@@ -348,13 +359,14 @@ class Operations:
         completion_ref=ref(self.root,write_once(directory/'COMPLETION.json',completion))
         consumer,cref=gate.consumer_for(self.root,m['operation'])
         checks=self._checks()
-        target_ref=ref(self.root,write_once(directory/'TARGET_WITNESS.json',{'season':2026,'week':target[1],'status':'PASS','provider_calls':0,
+        readiness_directory=directory/('consumer-'+digest(cref)[:16])
+        target_ref=ref(self.root,write_once(readiness_directory/'TARGET_WITNESS.json',{'season':2026,'week':target[1],'status':'PASS','provider_calls':0,
                         'witness_class':'LAB_ACTION_INPUTS','capability':'SETTLE','records':len(issued),'completion':completion_ref}))
         ready={'schema_version':'puntproof-lab-action-readiness-v2','capability':'SETTLE','status':'READY',
                'operation':m['operation'],'consumer':cref,'manifest':active['manifest'],'implementation':consumer['implementation'],
                'season':2026,'week':target[1],'attempt_consumed':False,
                'prechecks':{key:True for key in CHECKS['SETTLE']},'authored_adapter_checks':[checks],'target_witness':target_ref}
-        ready_ref=ref(self.root,write_once(directory/'SETTLEMENT_READINESS.json',ready))
+        ready_ref=ref(self.root,write_once(readiness_directory/'SETTLEMENT_READINESS.json',ready))
         return self.runtime.settle(active['manifest'],ready_ref,completion_ref)
 
     def run_ready(self):
@@ -402,11 +414,13 @@ class Operations:
             except (ValueError,OSError,KeyError,PermissionError,RuntimeError,TypeError) as e:
                 self.store.set_setting('paired_research_status',{'status':'BLOCKED','reason':str(e)})
                 failures.append({'function':'paired_research','reason':str(e),'title':'Bounded paired research needs attention','resolution_kind':'code repair','blocks':['Paired research']})
+            if settlement.get('status') in ('SETTLED_AND_LEARNED','ALREADY_SETTLED'):period=self.next_period()
             if period:automation.status(period)
+            pending_period=bool(period and any((f.get('season'),f.get('week'))==tuple(period) for f in self.store.records('forecast')))
             status={'checked_at':now(),'next_period':period,'failures':failures,'steps':steps,
                     'summary':'Independent available operations checked. '+('Some operations need attention.' if failures else 'Retained inputs and saved engines are connected.'),
-                    'next_action':f"Wait for complete Week {period[1]} outcomes" if period and self.store.records('forecast') else 'Connect compatible prior inputs',
-                    'settlement':settlement,'next_reason':'Complete next-week final-game, player outcome and participation evidence is required before settlement and sequential learning.' if self.store.records('forecast') else 'Load both saved engines and validate compatible prior player histories.'}
+                    'next_action':f"Wait for complete Week {period[1]} outcomes" if pending_period else f"Prepare eligible Week {period[1]} inputs" if period else 'Connect compatible prior inputs',
+                    'settlement':settlement,'next_reason':'Complete next-week final-game, player outcome and participation evidence is required before settlement and sequential learning.' if pending_period else 'The previous period is closed. Independently validate the next dated fixture and player population.'}
             self.store.set_setting('operation_status',status)
             return {'status':'PARTIAL' if failures else 'AVAILABLE_WORK_COMPLETE',**status}
         finally:

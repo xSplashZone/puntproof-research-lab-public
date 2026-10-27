@@ -35,6 +35,8 @@ TYPE_REPAIR_CONSUMERS = {op: TYPE_REPAIR_BASE+Path(path).name for op,path in CON
 TYPE_REPAIR_CONTRACT = TYPE_REPAIR_BASE+'RECOVERY_CONTRACT.json'
 AUTOMATION_CONSUMERS = {op: 'research/research_lab_v1/automation_v1/'+Path(path).name for op,path in CONSUMERS.items()}
 RUNTIME_CONSUMERS = {op: 'research/research_lab_v1/runtime_v1/'+Path(path).name for op,path in CONSUMERS.items()}
+GAMD_COMPAT_CONSUMERS = {op: 'research/research_lab_v1/gamd_compat_v1/'+Path(path).name for op,path in CONSUMERS.items()}
+GAMD_RUNTIME_COMPAT_CONSUMERS = {op: 'research/research_lab_v1/gamd_compat_v2/'+Path(path).name for op,path in CONSUMERS.items()}
 CAPABILITIES = {SOURCE: ('SOURCE_IMPORT','PREPARE_FORECAST'), REPLAY: ('SEED_INSPECTION','FORECAST','SETTLE'), FORWARD: ('FORECAST','SETTLE'), DEVELOPMENT: ('FORECAST','SETTLE')}
 CAPABILITY_CHECKS = {'SOURCE_IMPORT': ('source_path_hash_custody','source_projection_scope','missing_not_zero'), 'PREPARE_FORECAST': ('missing_not_zero','temporal_identity','same_week_poisoning'), 'SEED_INSPECTION': ('seed_hash_before_load','seed_channel_schema','inspection_no_fit_score'), 'FORECAST': ('missing_not_zero','temporal_identity','same_week_poisoning','partial_scope_labels'), 'SETTLE': ('positive_snap_zero_production','missing_not_zero','duplicate_settlement','whole_week_completion','artifact_roundtrip')}
 INSPECTION_STATES = ('PRETASK_VALID','INPUTS_VERIFIED','SEED_LOADED','INSPECTION_COMPLETE')
@@ -101,7 +103,7 @@ def consumer_for(root, operation, authority=None):
     semantics=authority['pre_model_semantics']
     need(semantics['operations'].get(operation)==[FAMILY],'EXACT_FAMILY')
     ref=semantics['consumers'].get(operation)
-    need(ref is not None and ref['path'] in (CONSUMERS[operation],ENCODING_REPAIR_CONSUMERS[operation],FINISH_CONSUMERS[operation],INPUT_REPAIR_CONSUMERS[operation],RECOVERY_CONSUMERS[operation],TYPE_REPAIR_CONSUMERS[operation],AUTOMATION_CONSUMERS[operation],RUNTIME_CONSUMERS[operation]),'EXACT_CONSUMER')
+    need(ref is not None and ref['path'] in (CONSUMERS[operation],ENCODING_REPAIR_CONSUMERS[operation],FINISH_CONSUMERS[operation],INPUT_REPAIR_CONSUMERS[operation],RECOVERY_CONSUMERS[operation],TYPE_REPAIR_CONSUMERS[operation],AUTOMATION_CONSUMERS[operation],RUNTIME_CONSUMERS[operation],GAMD_COMPAT_CONSUMERS[operation],GAMD_RUNTIME_COMPAT_CONSUMERS[operation],'research/research_lab_v1/bdl_compat_v1/'+Path(CONSUMERS[operation]).name,'research/research_lab_v1/bdl_compat_v2/'+Path(CONSUMERS[operation]).name,'research/research_lab_v1/bdl_format_v3/'+Path(CONSUMERS[operation]).name,'research/research_lab_v1/bdl_format_v4/'+Path(CONSUMERS[operation]).name,'research/research_lab_v1/bdl_closeout_v5/'+Path(CONSUMERS[operation]).name,'research/research_lab_v1/continuous_compat_v1/'+Path(CONSUMERS[operation]).name,'research/research_lab_v1/continuous_compat_v2/'+Path(CONSUMERS[operation]).name,'research/research_lab_v1/continuous_compat_v3/'+Path(CONSUMERS[operation]).name,'research/research_lab_v1/continuous_compat_v4/'+Path(CONSUMERS[operation]).name),'EXACT_CONSUMER')
     consumer=value(root,ref,committed=True)
     need(consumer['schema_version'] in ('puntproof-lab-consumer-v1','puntproof-lab-consumer-v2') and consumer['operation']==operation
          and consumer['family']==FAMILY and consumer['status']=='REGISTERED_CONDITIONAL','CONSUMER_SCHEMA')
