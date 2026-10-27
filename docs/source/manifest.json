@@ -15,24 +15,29 @@
     "bytes": 2847
   },
   {
+    "path": "tools/research_lab/gamd/continuous_context.py",
+    "sha256": "f8199d28cb2cc00b420043dd768bb71e545b77c9ebce1511087e2de66bf9ba75",
+    "bytes": 11349
+  },
+  {
     "path": "tools/research_lab/gamd/continuous_features.py",
-    "sha256": "f8737c79c26a05cadee817a80755862a9641d6cca4605b64fa7357e226dc79a0",
-    "bytes": 15378
+    "sha256": "277133449910342b4607d5f72c9313c6ae323277bb3f6fe137f914d4c6ff550f",
+    "bytes": 15871
   },
   {
     "path": "tools/research_lab/gamd/continuous_forward.py",
-    "sha256": "8847fb85203d1da347974f1da64d98d2a038e7f8e3f4403a8e0f3a1ff58304d2",
-    "bytes": 4788
+    "sha256": "8f2946e0badd5c1fd67a901ef9a3934e6bfe3bdade7e4ad083e937d26e07a56f",
+    "bytes": 12631
   },
   {
     "path": "tools/research_lab/gamd/continuous_incremental.py",
-    "sha256": "3a5681220cd7baca85653798303f9079a49aa3f26f65a524d48521bb07b64bf9",
-    "bytes": 2846
+    "sha256": "2ba862a964ca3ed1bf9916897ddee16ffdb660178de55d6746fce74839acb55d",
+    "bytes": 3039
   },
   {
     "path": "tools/research_lab/gamd/continuous_preparation.py",
-    "sha256": "478b697f045d5ed28b28ba78dc87d32cf95e57a5a12b9e2d5cff2847a2512fba",
-    "bytes": 5094
+    "sha256": "34a6aa27e029f3d29d484fd4e696bd28c31c7cf6bfaa69f7fa97bd3c86652965",
+    "bytes": 6285
   },
   {
     "path": "tools/research_lab/gamd/continuous_refit.py",
@@ -46,18 +51,18 @@
   },
   {
     "path": "tools/research_lab/gamd/continuous_runtime.py",
-    "sha256": "290e542551c5a3ddfae9906d324fe4cd3061f30afe9d16836ec022e71f76cae1",
-    "bytes": 7488
+    "sha256": "3b82623965d86f8423cc40dea4c938d6965b881aa063da977f9e61d8b868a24a",
+    "bytes": 14335
   },
   {
     "path": "tools/research_lab/gamd/continuous_settlement.py",
-    "sha256": "65a7daada362811fdc6fad3c7a0189ab9813c076657fb7d0d2658c9418fff607",
-    "bytes": 2396
+    "sha256": "d17f5312f956fd67efd9daff9031050d9d5c0fcf6e982c764d8a0de08ae8d78e",
+    "bytes": 8693
   },
   {
     "path": "tools/research_lab/gamd/continuous_source.py",
-    "sha256": "a02dc8dd43453a60b5b600659dc3f933a6b11f49394adbd1c7204404f472c52c",
-    "bytes": 19942
+    "sha256": "db6dc37de0440558533b718c8f35e9dbe46dd47faa589724545d1149d7f0c193",
+    "bytes": 33522
   },
   {
     "path": "tools/research_lab/gamd/continuous_train.py",
@@ -106,8 +111,8 @@
   },
   {
     "path": "tools/research_lab/gamd/licensed_source.py",
-    "sha256": "320e22e66b2850988f00ae9b55796dbe9583fbddf3a46ec5dec1cd0e0366326b",
-    "bytes": 19504
+    "sha256": "7e2613e10e1e53df05f2ce1620eaf97cf0b43e827d4edd2bf6f339d8cd207c01",
+    "bytes": 20595
   },
   {
     "path": "tools/research_lab/gamd/licensed_train.py",
@@ -141,13 +146,13 @@
   },
   {
     "path": "tools/research_lab/gamd/runtime.py",
-    "sha256": "c8c5a586f5a3a577b954654e98fadb2e2e065e11607e53b1b2ecc13951c2bbdc",
-    "bytes": 17045
+    "sha256": "caf688b9f836a2677ebb417aca0dc54049f53244bf8ad16d4ff2918e6044704e",
+    "bytes": 17363
   },
   {
     "path": "tools/research_lab/gamd/source.py",
-    "sha256": "de1aeebb4e6180599d6bb26f3768c7eb51822fccc24a41b581ededdd9b5cef6c",
-    "bytes": 9646
+    "sha256": "8757555f586ddc1f3814aea3a2202daf4b808b5c3ee88e5a5f873c16aacf8dde",
+    "bytes": 9894
   },
   {
     "path": "tools/research_lab/gamd/trainer.py",
@@ -161,8 +166,8 @@
   },
   {
     "path": "tools/research_lab/app_view.py",
-    "sha256": "889252ab1a9bd1750928cf212202fc945bbb75d8bd7870e0feb74582d6081edb",
-    "bytes": 15679
+    "sha256": "53d546ce54f0c3cc121413b6c4fce4293696611cee1166a8b2489f3267c37c71",
+    "bytes": 18546
   },
   {
     "path": "tools/research_lab/automation.py",
@@ -193,6 +198,11 @@
     "path": "tools/research_lab/experiments.py",
     "sha256": "af440f3af155df0b7fe787de87610ab2877be5e7fb283a08257b5ab99b8e77a9",
     "bytes": 6066
+  },
+  {
+    "path": "tools/research_lab/foundation_report.py",
+    "sha256": "abf99e93544c46fec0919e09dd60fb57ee44b5fab6f91fe865f56b96db14343a",
+    "bytes": 11608
   },
   {
     "path": "tools/research_lab/game_shadow.py",
@@ -251,8 +261,8 @@
   },
   {
     "path": "tools/research_lab/publish_testing.py",
-    "sha256": "36c7b9261a46980f81d7fdeb7c0128f853ec439b5e81d583962e76b79c39bc40",
-    "bytes": 9584
+    "sha256": "aab914d8c06a090ede12c05c7edb862746823a88f8762c1fb49237f9ffce7bf8",
+    "bytes": 12432
   },
   {
     "path": "tools/research_lab/recovery.py",
@@ -266,8 +276,8 @@
   },
   {
     "path": "tools/research_lab/server.py",
-    "sha256": "dadebc3588b49adcb2f7eefd83c6d1f098628ef2a0cdf30fb1278da21805b131",
-    "bytes": 25046
+    "sha256": "6308fd22c165ebddf44fff3c0a9ef7a6899df6c60ef4d37a1447f8cd8081d6b0",
+    "bytes": 26023
   },
   {
     "path": "tools/research_lab/source_adapter.py",
@@ -306,8 +316,8 @@
   },
   {
     "path": "tools/research_lab/static/app.js",
-    "sha256": "019d33b5d2573f610cbae560e8abfee079abb038fea6d2c3d6707cc4ddb6ff68",
-    "bytes": 87614
+    "sha256": "1bc08529a86844c955cec198310a4a8d8823b9698115e7280f14f1cd255fdc89",
+    "bytes": 93724
   },
   {
     "path": "tools/research_lab/static/index.html",
@@ -331,28 +341,28 @@
   },
   {
     "path": "src/nfl_model/research_lab_gate.py",
-    "sha256": "9b26b32b826c4f1619d4b8dafa10d5f9cbf323167ab4e639cfd36d494d39c082",
-    "bytes": 56787
+    "sha256": "7eb9c2fc5fa945ee87e364ef3c9c4eac6e54c13bd717d0cf28bbc5da4d453740",
+    "bytes": 56949
   },
   {
     "path": "src/nfl_model/research_lab_pair_gate.py",
-    "sha256": "b1a0f22c16ec6c4ad0d4ebd35e96ddfa7952bd4c801d3ff6da4d0d49fb2dbbca",
-    "bytes": 5536
+    "sha256": "dc879430bc4a0765dc9d8d49ddb431c8853ef4dbfd968580b0e2a3d1edfc9de4",
+    "bytes": 5684
   },
   {
     "path": "src/nfl_model/gamd_gate.py",
-    "sha256": "220c91e347e2d60d09e6f7302d5bd351a05984c4a94fa2d556f7591454fba58d",
-    "bytes": 41366
+    "sha256": "d36057ecccb1e102e633326905e538ea756e14157ddfbb0a19179a751ed0083b",
+    "bytes": 41470
   },
   {
     "path": "src/nfl_model/licensed_bdl_gate.py",
-    "sha256": "a516f70a26837fa2a7cba8c132c41156b9620668348d78ec3b8e36cdcecd110d",
+    "sha256": "3ddd912738e741ee618e528e6eae4552c52dc67c168b63e34058cf2d0b04d8eb",
     "bytes": 11172
   },
   {
     "path": "src/nfl_model/continuous_gamd_gate.py",
-    "sha256": "513866c36fb71b437b3158a75dc1cf3c0426bc9acb0c262c113d73e782200d78",
-    "bytes": 10118
+    "sha256": "68d6f140e3744c190bd647ec4fa3fd7c0c8227f1c4b3d6cc816d8a900441e8d6",
+    "bytes": 10451
   },
   {
     "path": "tests/research_lab/test_action_gate.py",
@@ -366,13 +376,13 @@
   },
   {
     "path": "tests/research_lab/test_continuous.py",
-    "sha256": "d71ad6b2fffdb337bec629fb3e955ecd9b09cdb899a7e8c105e1067aaefdbb35",
-    "bytes": 11119
+    "sha256": "c2da43b37863a2060cd9f0556392267c4881f1f6e7973c9afc4a92d9bcef33d3",
+    "bytes": 11897
   },
   {
     "path": "tests/research_lab/test_continuous_ui.py",
-    "sha256": "22a1e54ec91ca75f25012fb17c762f8c279caa6e1eeb173525314a6c7483c5c8",
-    "bytes": 2426
+    "sha256": "cc5b9e067a6accee6413bae45103eb57477e565fc370b28cf184b8d041695cc0",
+    "bytes": 2334
   },
   {
     "path": "tests/research_lab/test_core.py",
@@ -393,6 +403,31 @@
     "path": "tests/research_lab/test_experiments.py",
     "sha256": "5d27d9c72fb545f460a6a96663220c10401020aa5fdaca73a6537189f98b8f3a",
     "bytes": 3048
+  },
+  {
+    "path": "tests/research_lab/test_foundation_controls.py",
+    "sha256": "7d7d02f1169e6379095f848763ebcca794f761f5e5e171a14874ed9084bad9da",
+    "bytes": 5930
+  },
+  {
+    "path": "tests/research_lab/test_foundation_forward.py",
+    "sha256": "e17612adec183c919f63385a996143c84a744ffd7502ed29f1af4e0796d4b1c8",
+    "bytes": 22773
+  },
+  {
+    "path": "tests/research_lab/test_foundation_settlement.py",
+    "sha256": "c5d335da58cc7f5be9072018b5f5e1016782c067d4044276625145f80c306f21",
+    "bytes": 9603
+  },
+  {
+    "path": "tests/research_lab/test_foundation_source.py",
+    "sha256": "480bd74b32127b852785b992a36172c18f85671e96a072a38de6f4f2e72a8305",
+    "bytes": 16147
+  },
+  {
+    "path": "tests/research_lab/test_foundation_ui.py",
+    "sha256": "b6a0d319e843e4cbfe4706a47e108bd8cb08738e363fde2335b35df6c39f2f06",
+    "bytes": 22916
   },
   {
     "path": "tests/research_lab/test_gamd.py",
@@ -431,8 +466,8 @@
   },
   {
     "path": "tests/research_lab/test_licensed_bdl.py",
-    "sha256": "231a24b9e4ca1772f4ae5d8b5b2d56e4160e7d604e4ea068052aef9420a43929",
-    "bytes": 7856
+    "sha256": "aa8c33fd745f894919932db62bcb0b2e4a0c54f9df6966f3147f932df93ad049",
+    "bytes": 8690
   },
   {
     "path": "tests/research_lab/test_monitoring.py",

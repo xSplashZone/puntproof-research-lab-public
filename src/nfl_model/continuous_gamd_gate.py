@@ -26,7 +26,7 @@ def consumer_for(root,operation,authority=None):
  root=Path(root).resolve();a=authority or stage.current_authority();need(operation in OPS and operation in a['allowed_real_data_operations'],'OPERATION_NOT_REGISTERED')
  need(a['CURRENT_AUTHORISED_STAGE']==8 and a['PROTECTED_EVALUATION']=='DISABLED' and a['REAL_DATA_MODELLING']=='BLOCKED' and a['LATER_STAGE_REAL_DATA_MODELLING']=='BLOCKED','GLOBAL_BOUNDARY')
  sem=a['pre_model_semantics'];need(sem['operations'].get(operation)==[FAMILY],'FAMILY_BINDING');cr=sem['consumers'][operation]
- need(cr['path'] in [BASE+prefix+dict(zip(OPS,('SOURCE','DEVELOPMENT','FORWARD')))[operation]+'_CONSUMER.json' for prefix in ('','runtime_v2/','runtime_v3/','runtime_v4/')],'EXACT_CONSUMER')
+ need(cr['path'] in [BASE+prefix+dict(zip(OPS,('SOURCE','DEVELOPMENT','FORWARD')))[operation]+'_CONSUMER.json' for prefix in ('','runtime_v2/','runtime_v3/','runtime_v4/','foundation_v2/','runtime_v6/')],'EXACT_CONSUMER')
  c=read(root,cr,True);need(c['operation']==operation and c['family']==FAMILY and c['limits']==LIMITS and c['foundations']==sem['certificates'][FAMILY],'CONSUMER_SCOPE')
  for item in [*c['foundations'].values(),c['owner_request'],c['policy'],c['catalogue'],c['adapter_canary'],*c['implementation']]:checked(root,item,True)
  need(c['owner_request']['sha256']==OWNER_SHA and stamp(c['expires_at'])>datetime.now(timezone.utc),'OWNER_OR_EXPIRY')
@@ -65,6 +65,7 @@ def manifest(root,operation,mr):
 def pretask(root,operation,m):
  s=importlib.util.spec_from_file_location('continuous_task_guard',Path(root)/'tools/codex_task_guard.py');g=importlib.util.module_from_spec(s);s.loader.exec_module(g)
  body={'task_id':operation,'task_class':'SOURCE_ADMISSION' if operation==SOURCE else 'MODEL_EXPERIMENT','allowed_actions':['READ_METADATA']+(['MODEL_EXECUTION'] if operation!=SOURCE else []),'completion_states':['CONTINUOUS_OPERATION_COMPLETE'],'external_access':'NONE','paid_access':False,'protected_result_access':False,'pretask_satisfiability':m['pretask_satisfiability']}
+ if operation==DEVELOPMENT and m.get('candidate',{}).get('foundation_protocol')=='FOUNDATION_FIXED_HGB_PAIR_V1':body['model_execution']={'operation':operation,'zone':'DEVELOPMENT','seasons':[2023,2024],'inputs':{FAMILY:[ref(root,Path(m['pretask_satisfiability']['path']).with_name('MANIFEST.json'))]}}
  return g.satisfiability(Path(root),body,execution=True)
 def require_active(root,operation):
  a=_ACTIVE.get();need(a and a['root']==Path(root).resolve() and a['operation']==operation,'ACTIVE_CONTEXT_REQUIRED');return a

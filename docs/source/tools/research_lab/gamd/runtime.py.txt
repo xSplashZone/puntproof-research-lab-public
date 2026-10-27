@@ -161,15 +161,20 @@ class Coordinator:
   self.recovery_pending=False
  def run_once(self):
   if self.stop_event.is_set() or self.store.get_setting('worker_paused',False):return {'status':'PAUSED'}
-  try:policy=self.gate().require_campaign(self.root)
-  except (ImportError,OSError,ValueError,RuntimeError) as exc:
-   self.store.set_setting('gamd_next_action','Exact GAMD authority is required before historical data projection or fitting.')
-   return {'status':'BLOCKED','reason':str(exc)}
-  resource=self.worker.resource_status(force=self.force_idle)
-  if not resource['allowed']:
-   self.store.set_setting('gamd_next_action','Waiting for PC resources: '+', '.join(resource['reasons']));return {'status':'RESOURCE_WAIT'}
   if not self.worker.run_lock.acquire(blocking=False):return {'status':'EXISTING_LAB_WORKER_BUSY'}
   try:
+   # Observation has its own admitted source path and requires no fitting budget.
+   from gamd.continuous_runtime import observe
+   observation=observe(self)
+   observed={k:v for k,v in observation.items() if k!='receipt'}
+   try:policy=self.gate().require_campaign(self.root)
+   except (ImportError,OSError,ValueError,RuntimeError) as exc:
+    self.store.set_setting('gamd_next_action','Historical development needs its exact authority; independent observation was checked.')
+    return {'status':'BLOCKED','reason':str(exc),'observation':observed}
+   resource=self.worker.resource_status(force=self.force_idle)
+   if not resource['allowed']:
+    self.store.set_setting('gamd_next_action','Fitting waits for PC resources: '+', '.join(resource['reasons']))
+    return {'status':'RESOURCE_WAIT','observation':observed}
    if self.recovery_pending:self.recover_claims(policy)
    # Independent source work is allowed even if historical fitting has no labels,
    # and a coverage source problem does not disable the separate fit pipeline.
@@ -193,7 +198,7 @@ class Coordinator:
     if licensed.get('status') not in ('CAMPAIGN_COMPLETE','BLOCKED','LIVE_CHARTER_ACTIVE'):return licensed
     forward=self.forward_work()
     from gamd.continuous_runtime import run_next as continuous_next
-    continuous=continuous_next(self)
+    continuous=continuous_next(self,observation=observation)
     return {'status':'STANDING_DEVELOPMENT','forward':forward,'continuous':continuous}
    selected=None;blocked=[]
    for candidate in candidates:

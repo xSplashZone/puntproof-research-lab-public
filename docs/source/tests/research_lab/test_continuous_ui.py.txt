@@ -16,7 +16,8 @@ class ContinuousUiTests(unittest.TestCase):
  def test_scheduled_null_metrics_are_not_zero_accuracy(self):
   s=self.run_js("console.log(JSON.stringify(continuousEvidence({plan:{process:'SCHEDULED_REFIT'},result:{metrics:null}})))");self.assertIn('no evaluation',s)
 
- def test_admitted_bdl_warning_is_not_storage_only(self):
+ def test_current_server_issue_is_not_overridden_by_historical_browser_state(self):
   s=(ROOT/'tools/research_lab/static/app.js').read_text(encoding='utf8');a=s.index('  function displayIssue(');b=s.index('  function researchCounts(',a)
-  script="const state={gamd:{licensed_bdl:{runtime:{internal_policy:'UPDATED'}}},home:{counts:{candidates_tested:2}}};"+s[a:b]+"console.log(JSON.stringify([displayIssue({id:'snap'}),displayIssue({id:'experiment'})]));"
-  r=subprocess.run(['node','-e',script],capture_output=True,text=True);self.assertEqual(r.returncode,0,r.stderr);v=json.loads(r.stdout);self.assertIn('admitted for private',v[0]['summary']);self.assertNotIn('storage-only',v[0]['summary']);self.assertIn('2 sealed',v[1]['summary'])
+  script="const state={gamd:{licensed_bdl:{runtime:{internal_policy:'UPDATED'}}}};"+s[a:b]+"console.log(JSON.stringify(displayIssue({id:'snap',summary:'Verified current source gap'})));"
+  r=subprocess.run(['node','-e',script],capture_output=True,text=True);self.assertEqual(r.returncode,0,r.stderr)
+  self.assertEqual(json.loads(r.stdout)['summary'],'Verified current source gap')

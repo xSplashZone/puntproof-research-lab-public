@@ -50,7 +50,7 @@ class LicensedTests(unittest.TestCase):
   with self.assertRaisesRegex(ValueError,'PROTECTED'):list(s.read_partition('.',{'season':2025,'phase':2}))
  def test_snap_denominator(self):
   def n(pid,snaps):return {'game':{'id':5},'team':{'abbreviation':'PHI'},'player':{'id':pid},'offense_snaps':snaps}
-  den=s.snap_values([n(1,20),n(2,60),n(3,0)])[(5,'PHI')];self.assertEqual(den['snap_denominator'],60);self.assertEqual(den['native_players'],3)
+  den=s.snap_values([n(1,20),n(2,60),n(3,0)])[(5,'PHI')];self.assertIsNone(den['snap_denominator']);self.assertEqual(den['observed_max_offense_snaps'],60);self.assertEqual(den['native_players'],3)
   self.assertFalse(s.snap_values([n(1,20),n(2,None)])[(5,'PHI')]['team_game_complete'])
  def proof(self,off=10,explicit=True):
   a=admission(source_id='licensed_balldontlie',dataset='snap_counts',rights_owner='BALLDONTLIE',licence_lane=g.FAMILY)
@@ -76,6 +76,16 @@ class LicensedTests(unittest.TestCase):
   with patch.object(g,'manifest',return_value=({},None,{},None,None)),patch.object(g,'pretask'),patch.object(g,'attempt',return_value={'status':'COMPLETED'}):
    with self.assertRaisesRegex(ValueError,'ATTEMPT_CONSUMED'):g.require_fit(Path('.'),{})
  def test_artifact_roundtrip(self):
+  # The application and frozen estimator runtime intentionally use different Python versions.
+  try:import joblib
+  except ImportError:
+   import subprocess
+   root=Path(__file__).resolve().parents[2]
+   interpreter=root/'scratch/v3-python/cpython-3.13.17-windows-x86_64-none/python.exe'
+   code="import sys,unittest;sys.path[:0]=['scratch/v3-env/Lib/site-packages','src','tools/research_lab','tests/research_lab'];r=unittest.TextTestRunner().run(unittest.defaultTestLoader.loadTestsFromName('test_licensed_bdl.LicensedTests.test_artifact_roundtrip'));raise SystemExit(not r.wasSuccessful())"
+   result=subprocess.run([str(interpreter),'-I','-B','-S','-c',code],cwd=root,capture_output=True,text=True)
+   self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+   return
   import numpy as np,joblib
   from gamd.trainer import _fit,_predict
   rows=[{'x':[float(i),None if i%3==0 else .5],'yards':float(i%11),'workload':float(i%5)} for i in range(120)]

@@ -1,9 +1,274 @@
 {
   "cloud_mode": true,
-  "captured_at": "2026-10-27T08:22:58.128782+00:00",
+  "captured_at": "2026-10-27T22:48:24.3289546+10:00",
   "home": {
+    "foundation": {
+      "canonical_revision": "puntproof-gamd-foundation-v2",
+      "source_cutoff": "2026-10-27T11:30:02.462129+00:00",
+      "dataset_health": {
+        "status": "VERIFIED_WITH_SCOPED_GAPS"
+      },
+      "coverage": {
+        "fixed_prior_usage_eligible": 83,
+        "fixed_prior_usage_n": 115,
+        "gamd_supported": 451,
+        "new_eligible": 244,
+        "original_decisions": 783,
+        "original_issued": 161,
+        "previous_eligible": 184,
+        "priority_cases": 65,
+        "priority_missing_fields": 392,
+        "priority_repaired_fields": 392
+      },
+      "matched_F": [
+        {
+          "recipe": "extra_trees_conditional_receiving",
+          "channel": "receiving",
+          "status": "WORSE_THAN_F",
+          "comparison_basis": "Earlier saved result",
+          "n": 3301,
+          "candidate_mae": 18.007232168305105,
+          "F_mae": 17.609018433162472,
+          "delta_mae": 0.39821373514263314,
+          "candidate_crps": 13.02962863881575,
+          "F_crps": 12.529686708155635
+        },
+        {
+          "recipe": "individual_context_receiving",
+          "channel": "receiving",
+          "status": "WORSE_THAN_F",
+          "comparison_basis": "Foundation repaired data",
+          "n": 3301,
+          "candidate_mae": 18.162466131472783,
+          "F_mae": 17.609018433162472,
+          "delta_mae": 0.5534476983103112,
+          "candidate_crps": 12.995425530243812,
+          "F_crps": 12.529686708155635
+        },
+        {
+          "recipe": "individual_context_rushing",
+          "channel": "rushing",
+          "status": "WORSE_THAN_F",
+          "comparison_basis": "Earlier saved result",
+          "n": 999,
+          "candidate_mae": 22.29986782418462,
+          "F_mae": 21.228678742901668,
+          "delta_mae": 1.0711890812829523,
+          "candidate_crps": 15.96432838432111,
+          "F_crps": 14.797031241255599
+        },
+        {
+          "recipe": "individual_context_rushing",
+          "channel": "rushing",
+          "status": "WORSE_THAN_F",
+          "comparison_basis": "Foundation repaired data",
+          "n": 999,
+          "candidate_mae": 22.213057695812946,
+          "F_mae": 21.228678742901668,
+          "delta_mae": 0.9843789529112783,
+          "candidate_crps": 15.915346322507945,
+          "F_crps": 14.797031241255599
+        },
+        {
+          "recipe": "individual_context_receiving",
+          "channel": "receiving",
+          "status": "WORSE_THAN_F",
+          "comparison_basis": "Earlier saved result",
+          "n": 3301,
+          "candidate_mae": 18.228822842196315,
+          "F_mae": 17.609018433162472,
+          "delta_mae": 0.6198044090338435,
+          "candidate_crps": 13.096224457512447,
+          "F_crps": 12.529686708155635
+        }
+      ],
+      "probability_audit": [
+        {
+          "recipe": "extra_trees_conditional_receiving",
+          "channel": "receiving",
+          "comparison_basis": "Earlier saved result",
+          "all": {
+            "n": 3340,
+            "events": {
+              "negative": {
+                "predicted": 0.146764964277962,
+                "observed": 0.011676646706586826,
+                "brier": 0.048688166298991746,
+                "log_loss": null,
+                "zero_likelihood_cases": 4,
+                "ece": 0.13508831757137518
+              },
+              "zero": {
+                "predicted": 0.01462790036830538,
+                "observed": 0.17065868263473055,
+                "brier": 0.16280619326949866,
+                "log_loss": null,
+                "zero_likelihood_cases": 22,
+                "ece": 0.15603078226642517
+              },
+              "150plus": {
+                "predicted": 0.0006211666780674529,
+                "observed": 0.005089820359281437,
+                "brier": 0.005039396463032931,
+                "log_loss": null,
+                "zero_likelihood_cases": 9,
+                "ece": 0.004468653681213984
+              }
+            }
+          }
+        },
+        {
+          "recipe": "individual_context_receiving",
+          "channel": "receiving",
+          "comparison_basis": "Foundation repaired data",
+          "all": {
+            "n": 3340,
+            "events": {
+              "negative": {
+                "predicted": 0.1301355040281875,
+                "observed": 0.011676646706586826,
+                "brier": 0.040053995704264364,
+                "log_loss": null,
+                "zero_likelihood_cases": 2,
+                "ece": 0.11845885732160068
+              },
+              "zero": {
+                "predicted": 0.01661543217782133,
+                "observed": 0.17065868263473055,
+                "brier": 0.16109577811812248,
+                "log_loss": null,
+                "zero_likelihood_cases": 22,
+                "ece": 0.15404325045690925
+              },
+              "150plus": {
+                "predicted": 0.001104948651001505,
+                "observed": 0.005089820359281437,
+                "brier": 0.005044410949622851,
+                "log_loss": null,
+                "zero_likelihood_cases": 10,
+                "ece": 0.004113551008437317
+              }
+            }
+          }
+        },
+        {
+          "recipe": "individual_context_rushing",
+          "channel": "rushing",
+          "comparison_basis": "Earlier saved result",
+          "all": {
+            "n": 1003,
+            "events": {
+              "negative": {
+                "predicted": 0.09434712322512821,
+                "observed": 0.0259222333000997,
+                "brier": 0.034888439188481515,
+                "log_loss": null,
+                "zero_likelihood_cases": 1,
+                "ece": 0.06842488992502851
+              },
+              "zero": {
+                "predicted": 0.010135083733355603,
+                "observed": 0.05982053838484546,
+                "brier": 0.05751624462235055,
+                "log_loss": null,
+                "zero_likelihood_cases": 1,
+                "ece": 0.04968545465148986
+              },
+              "150plus": {
+                "predicted": 0.005524446531435684,
+                "observed": 0.014955134596211365,
+                "brier": 0.01421430606000823,
+                "log_loss": null,
+                "zero_likelihood_cases": 2,
+                "ece": 0.009430688064775681
+              }
+            }
+          }
+        },
+        {
+          "recipe": "individual_context_rushing",
+          "channel": "rushing",
+          "comparison_basis": "Foundation repaired data",
+          "all": {
+            "n": 1003,
+            "events": {
+              "negative": {
+                "predicted": 0.10644019874972033,
+                "observed": 0.0259222333000997,
+                "brier": 0.037435532931657606,
+                "log_loss": 0.16757827848067547,
+                "zero_likelihood_cases": 0,
+                "ece": 0.08051796544962063
+              },
+              "zero": {
+                "predicted": 0.009706001152892973,
+                "observed": 0.05982053838484546,
+                "brier": 0.05764377919177213,
+                "log_loss": null,
+                "zero_likelihood_cases": 1,
+                "ece": 0.050114537231952486
+              },
+              "150plus": {
+                "predicted": 0.006884068519592932,
+                "observed": 0.014955134596211365,
+                "brier": 0.014203011748669876,
+                "log_loss": null,
+                "zero_likelihood_cases": 2,
+                "ece": 0.008071066076618432
+              }
+            }
+          }
+        },
+        {
+          "recipe": "individual_context_receiving",
+          "channel": "receiving",
+          "comparison_basis": "Earlier saved result",
+          "all": {
+            "n": 3340,
+            "events": {
+              "negative": {
+                "predicted": 0.13353669188472087,
+                "observed": 0.011676646706586826,
+                "brier": 0.04099859377192201,
+                "log_loss": null,
+                "zero_likelihood_cases": 2,
+                "ece": 0.12186004517813404
+              },
+              "zero": {
+                "predicted": 0.016430195300045882,
+                "observed": 0.17065868263473055,
+                "brier": 0.16103243308759607,
+                "log_loss": null,
+                "zero_likelihood_cases": 25,
+                "ece": 0.15422848733468467
+              },
+              "150plus": {
+                "predicted": 0.0012830225297865492,
+                "observed": 0.005089820359281437,
+                "brier": 0.005021358002626615,
+                "log_loss": null,
+                "zero_likelihood_cases": 8,
+                "ece": 0.003806797829494888
+              }
+            }
+          }
+        }
+      ],
+      "evidence_warnings": {
+        "invalid_result_count": 0
+      },
+      "probability_status": "Experimental; calibration and signed/zero/tail mass require review.",
+      "observation": {
+        "issued": 1915,
+        "scored": 0,
+        "pending": 1915,
+        "unknown": 0,
+        "verified_dnp": 0
+      },
+      "report_links": {}
+    },
     "headline": "Public investigation copy",
-    "summary": "Published investigation snapshot captured 2026-10-27T08:22:58.128782+00:00. This cloud copy does not run the local Python engine or worker.",
+    "summary": "Published investigation snapshot captured 2026-10-27T22:48:24.3289546+10:00. This cloud copy does not run the local Python engine or worker.",
     "counts": {
       "seeds_loaded": 2,
       "source_records_validated": 44048,
@@ -16,23 +281,10 @@
       "label": "Snapshot only",
       "detail": "The operational V3 engine remains on the owner’s PC. This hosted copy exposes the interface and reviewed source code."
     },
-    "last_real": {
-      "refresh": {
-        "summary": "44048 records validated; private event times omitted"
-      },
-      "forecast": {
-        "summary": "161 original forecasts sealed; private records omitted"
-      },
-      "learning": {
-        "summary": "1 completed sequential update; private child states omitted"
-      },
-      "experiment": {
-        "summary": "2 completed V3 comparisons; GAMD listed separately"
-      }
-    },
+    "last_real": {},
     "next": {
       "label": "Inspect the public source or test the interface",
-      "reason": "This snapshot reports saved completed work at capture. Public source: /source/index.html"
+      "reason": "This snapshot reports saved completed work at capture. Public source: ./source/index.html"
     },
     "primary_action": {
       "label": "Local operations are unavailable in this copy",
@@ -63,7 +315,7 @@
     {
       "id": "cloud-scope",
       "title": "The hosted copy is for interface and code investigation",
-      "summary": "Published investigation snapshot captured 2026-10-27T08:22:58.128782+00:00. This cloud copy does not run the local Python engine or worker. Full cloud V3 execution requires a separate Python-capable host with private storage and admitted engine/data access.",
+      "summary": "Published investigation snapshot captured 2026-10-27T22:48:24.3289546+10:00. This cloud copy does not run the local Python engine or worker. Full cloud V3 execution requires a separate Python-capable host with private storage and admitted engine/data access.",
       "status": "OPEN",
       "owner_required": false,
       "blocks": [
@@ -458,8 +710,7 @@
           "status": "PREFLIGHT_FAILED",
           "elapsed_seconds": 0.0,
           "phase": "PLANNED",
-          "result": null,
-          "error": "Duplicate numerical inputs skipped before fitting; source custody metadata alone changed."
+          "result": null
         },
         {
           "id": "aggregate-8",
@@ -472,8 +723,137 @@
           "status": "PREFLIGHT_FAILED",
           "elapsed_seconds": 0.0,
           "phase": "PLANNED",
-          "result": null,
-          "error": "Duplicate numerical inputs skipped before fitting; source custody metadata alone changed."
+          "result": null
+        },
+        {
+          "id": "aggregate-9",
+          "plan": {
+            "template_id": "individual_context_receiving",
+            "process": "EXPERIMENTAL_DEVELOPMENT",
+            "family": "hist_gradient_boosting",
+            "channel": "receiving"
+          },
+          "status": "COMPLETED",
+          "elapsed_seconds": 37.681071600003634,
+          "phase": "EVALUATION_OPENED",
+          "result": {
+            "metrics": {
+              "n": 3340,
+              "mae": 18.122190191385577,
+              "crps": 12.955435190357525,
+              "coverage80": 0.8089820359281437,
+              "interval80_width": 57.458383233532935,
+              "median_mae": 17.63053892215569,
+              "threshold_brier": 0.11506305520481826
+            },
+            "matched_candidate_metrics": {
+              "n": 3340,
+              "mae": 18.122190191385577,
+              "crps": 12.955435190357525,
+              "coverage80": 0.8089820359281437,
+              "interval80_width": 57.458383233532935,
+              "median_mae": 17.63053892215569,
+              "threshold_brier": 0.11506305520481826
+            },
+            "completed_folds": 1,
+            "probability_status": "EXPERIMENTAL_UNVALIDATED",
+            "classification": "EXPOSED_REVISED_HISTORY_DEVELOPMENT",
+            "frozen_controls": {
+              "same_population_n": 3301,
+              "candidate": {
+                "n": 3301,
+                "mae": 18.162466131472783,
+                "crps": 12.995425530243812,
+                "coverage80": 0.8079369887912754,
+                "interval80_width": 57.55740684641018,
+                "median_mae": 17.688276279915176,
+                "threshold_brier": 0.11527514207907187
+              },
+              "F": {
+                "n": 3301,
+                "mae": 17.609018433162472,
+                "crps": 12.529686708155635,
+                "coverage80": 0.8679188124810664,
+                "interval80_width": 56.002120569524386,
+                "median_mae": 17.655558921538926,
+                "threshold_brier": 0.11086739615504217
+              },
+              "B": {
+                "n": 3301,
+                "mae": 18.152411499467306,
+                "crps": 13.67188758987052,
+                "coverage80": 0.7364435019691002,
+                "interval80_width": 47.720084822780976,
+                "median_mae": 18.7494698576189,
+                "threshold_brier": 0.12088972348633735
+              }
+            }
+          }
+        },
+        {
+          "id": "aggregate-10",
+          "plan": {
+            "template_id": "individual_context_rushing",
+            "process": "EXPERIMENTAL_DEVELOPMENT",
+            "family": "hist_gradient_boosting",
+            "channel": "rushing"
+          },
+          "status": "REJECTED",
+          "elapsed_seconds": 34.23621319999802,
+          "phase": "EVALUATION_OPENED",
+          "result": {
+            "metrics": {
+              "n": 1003,
+              "mae": 22.30250507402808,
+              "crps": 16.007908681599535,
+              "coverage80": 0.8155533399800599,
+              "interval80_width": 67.81555333998006,
+              "median_mae": 22.11864406779661,
+              "threshold_brier": 0.1290612987154816
+            },
+            "matched_candidate_metrics": {
+              "n": 1003,
+              "mae": 22.30250507402808,
+              "crps": 16.007908681599535,
+              "coverage80": 0.8155533399800599,
+              "interval80_width": 67.81555333998006,
+              "median_mae": 22.11864406779661,
+              "threshold_brier": 0.1290612987154816
+            },
+            "completed_folds": 1,
+            "probability_status": "EXPERIMENTAL_UNVALIDATED",
+            "classification": "EXPOSED_REVISED_HISTORY_DEVELOPMENT",
+            "frozen_controls": {
+              "same_population_n": 999,
+              "candidate": {
+                "n": 999,
+                "mae": 22.213057695812946,
+                "crps": 15.915346322507945,
+                "coverage80": 0.8158158158158159,
+                "interval80_width": 67.88288288288288,
+                "median_mae": 22.037037037037038,
+                "threshold_brier": 0.12875702820047763
+              },
+              "F": {
+                "n": 999,
+                "mae": 21.228678742901668,
+                "crps": 14.797031241255599,
+                "coverage80": 0.8078078078078078,
+                "interval80_width": 63.88488488488488,
+                "median_mae": 20.95995995995996,
+                "threshold_brier": 0.12187117308348387
+              },
+              "B": {
+                "n": 999,
+                "mae": 21.437342387900785,
+                "crps": 16.061070963910666,
+                "coverage80": 0.6866866866866866,
+                "interval80_width": 55.8958958958959,
+                "median_mae": 22.416416416416418,
+                "threshold_brier": 0.13340745695127246
+              }
+            }
+          }
         }
       ],
       "runtime": {
@@ -485,11 +865,11 @@
         "B": "VERSIONED_MODEL_SAVED_AWAITING_FUTURE_EVALUATION"
       },
       "forward": {
-        "status": "SEALED_PREGAME",
-        "games": 1,
-        "forecasts": 39,
-        "targets": 39,
-        "exclusions": 31
+        "status": "SEALED_PREGAME_WITH_GAPS",
+        "games": 14,
+        "forecasts": 1915,
+        "targets": 469,
+        "exclusions": 2397
       },
       "source": {
         "summary": {

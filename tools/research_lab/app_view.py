@@ -1,6 +1,7 @@
 """Owner-facing state derived only from persistent actual-operation records."""
 from core import now
 from hashlib import sha256
+from foundation_report import owner_foundation
 
 def actual_records(rows):
     """Exclude explicitly labelled validation/reference records from real activity."""
@@ -14,7 +15,7 @@ def latest_by(rows, key):
             result[row.get(key)]=row
     return list(result.values())
 
-def owner_state(store, runtime):
+def owner_state(store, runtime, *, execution_busy=False):
     imports=latest_by(actual_records(store.records('source_import')),'dataset')
     seeds=latest_by(actual_records(store.records('seed_inspection')),'channel')
     forecasts=actual_records(store.records('forecast'))
@@ -51,7 +52,17 @@ def owner_state(store, runtime):
     elif reasons: detail='; '.join(reasons)
     elif status.startswith('RUNNING:'): detail=store.get_setting('operation_current_step') or 'Running the current research operation.'
     else: detail=operation.get('summary','Checking retained data for supported work')
-    worker={'label':worker_label,'detail':detail,
+    if execution_busy:
+        worker_label='Finishing current work' if paused or status in ('STOPPED','STOPPING') else 'Working'
+        if paused:
+            detail='An operation is finishing. Automatic research remains paused until you resume it.'
+        elif status in ('STOPPED','STOPPING'):
+            detail='An operation is finishing before the worker stops. No new work will start.'
+        elif status.startswith(('FAILED','ERROR')):
+            detail='An operation is running. The saved worker error still needs investigation; unresolved issues remain below.'
+        else:
+            detail='An operation is running. Completed results are counted only after they are saved.'
+    worker={'label':worker_label,'detail':detail,'execution_busy':bool(execution_busy),'paused':bool(paused),'saved_status':status,
             'retry_at':None if status in ('STOPPED','STOPPING') or paused else store.get_setting('worker_retry_at') or store.get_setting('worker_next_run'),
             'resource_measurements':resources}
     checked=operation.get('checked_at') or runtime.get('checked_at') or now()
@@ -94,24 +105,28 @@ def owner_state(store, runtime):
         issue('results',f'Waiting for complete {week} results',
               (operation.get('settlement',{}).get('reason') or (available+'. ' if available else ''))+' Settlement and learning require complete final-game and participation evidence for the issued population. Forecasts remain saved.',
               ['Settlement','Learning','Measured forecast performance'],source='Retained player statistics and play-by-play')
-    issue('experiment','Development experiments need a complete eligible evaluation',
-          'An exact frozen, approved and unconsumed candidate specification, matched sealed control and candidate predictions, and complete chronological outcomes are required. Knowledge-linked proposals are saved separately; none count as tested candidates.',
-          ['Development experiments'],'specification',False)
+    if not candidates:
+        issue('experiment','No completed V3 component comparison',
+              'V3 paired comparisons need an exact frozen, approved and unconsumed specification, matched sealed control and candidate predictions, and complete chronological outcomes. GAMD fitted challengers and their measured results are reported separately.',
+              ['V3 paired comparisons'],'data',False)
     if not store.bets():
         issue('betting','Betting returns are not measured','No genuine timestamped offer and verified settled wager records are connected. Ordinary forecasts do not depend on these records.',
               ['Genuine betting ROI'],'configuration',True,source='Bookmaker offers and wager settlements')
     acquisition=issue('acquisition','Newer inputs use the existing Data Manager',
-          'The exact Data Manager bridge is prepared. Its provider request authority needs the bounded approval in AUTOMATION_PERMISSION_DELTA.md; retained imports continue independently. Existing records remain usable.',
+          'No current Data Manager refresh receipt is available. Check the installed bridge and its last request; retained imports continue independently. Existing records remain usable.',
           ['Acquisition of newer inputs'],'source connection',True,source='Existing Data Manager archive',
-          technical={'mode':'READ_ONLY_POLLING','provider_refresh_connector':False,'prepared_connector_state':'PREPARED_AWAITING_AUTHORITY','provider_acquisition_grant':False})
+          technical={'mode':'READ_ONLY_POLLING','provider_refresh_connector':False,'prepared_connector_state':'CURRENT_RECEIPT_UNAVAILABLE','provider_acquisition_grant':False})
     automatic=store.get_setting('manager_refresh_status')
     if automatic:
         acquisition.update(owner_required=False,resolution_kind='automatic',summary=automatic.get('reason','Automatic refresh requests use the approved Data Manager bridge. Each source has a six-hour minimum demand interval; imported outcomes still require finality and identity checks.'))
         acquisition['technical'].update(provider_refresh_connector=True,provider_acquisition_grant=True)
     issue('history','Exact past-run reproduction is unavailable','The runtime package does not include the original full feature matrix and historical checkpoints.',
           ['Exact historical reproduction'],'missing artifact',False,source='Supplied V3 runtime package')
-    issue('snap','Snap coverage is not admitted for this model','BALLDONTLIE archive access is storage-only and its player crosswalk is unverified. PFR has a separate rights restriction. Optional snap features remain unknown; unsupported player histories are excluded.',
-          ['Snap-dependent features','Complete player coverage'],'permission',False,source='BALLDONTLIE and PFR')
+    foundation=owner_foundation(store)
+    health=foundation.get('dataset_health')
+    issue('snap','Participation and snap denominators need separate evidence',
+          'Positive retained snap counts can establish appearance. Snap shares require an independently verified full-team denominator. Unknown coverage stays unknown; PFR provenance is assessed separately.',
+          ['Complete participation coverage','Snap-share features'],'data',False,source='Retained participation evidence',technical={'dataset_health':health})
     issue('production','Production model identity is unverified','A read-only feed status confirmed configuration, but did not establish the deployed model identity. Comparisons against frozen research remain available.',
           ['Claims about beating production'],'configuration',False,source='Production metadata')
     # Retain consequential incidents. Old global/metadata duplicates belong to the
@@ -141,6 +156,20 @@ def owner_state(store, runtime):
         ('experiment','Development experiments','COMPLETE' if candidates else 'WAITING',f'{len(candidates)} candidates tested.'),
         ('betting','Genuine betting returns','NOT_MEASURED','Exact offers and settlements are required.'),
         ('reproduction','Exact historical reproduction','BLOCKED','Original full matrix and checkpoints are absent.')]
+    # Only completed recovery receipts emitted after same-input seal verification
+    # are presentation evidence. Keep the original incident and its checks intact.
+    recovery_refs=('original_manifest','original_claim','timeout_evidence','os_standby_evidence','recovery_manifest','recovery_seal')
+    recoveries=[r for r in store.records('continuous_forward_recovery')
+        if r.get('schema')=='PUNTPROOF_FORWARD_RECOVERY_V1' and r.get('status')=='COMPLETED'
+        and r.get('original_files_unchanged') is True and r.get('old_claim_modified') is False
+        and r.get('old_failure_retained') is True and r.get('fits')==0 and r.get('provider_calls')==0
+        and r.get('input_revision') and r.get('recovered_at') and isinstance(r.get('forecasts'),int)
+        and r['forecasts']>0 and all(isinstance(r.get(k),dict) and r[k].get('path') and len(r[k].get('sha256',''))==64 for k in recovery_refs)
+        and r.get('id')==r['original_manifest']['sha256']]
+    if recoveries:
+        recovered_forecasts=sum(r['forecasts'] for r in recoveries)
+        functions.append(('forward_recovery','Recovered forecast work','COMPLETE',
+            f'{len(recoveries)} verified same-input recovery completed; {recovered_forecasts} forecasts saved. Original timeout evidence remains available. This is not a fit or a learning update.'))
     function_status=[dict(id=i,label=l,status=t,summary=m,blocker_ids=[a['id'] for a in attention if any(l.lower() in b.lower() for b in a['blocks'])]) for i,l,t,m in functions]
     def last(rows,kind):
         if not rows:return None
@@ -150,13 +179,20 @@ def owner_state(store, runtime):
     if failures:headline='Some operations need attention'
     elif len(seeds)<2 or not imports:headline='Setup incomplete — connecting real data'
     elif forecasts and not heads:headline=f'Waiting for {week} results'
-    elif heads:headline='Learning from completed games'
+    elif heads:headline='Verified results saved; watching for the next eligible work'
     else:headline=f'Preparing {week} forecasts'
     next_label=operation.get('next_action') or ('Load the saved engines' if not ready_seeds else 'Import retained football records' if not imports else f'Generate {week} forecasts' if not forecasts else f'Import complete {week} outcomes')
     summary=operation.get('summary') or ('The saved engine and permitted records are being connected.' if not forecasts else 'Real-input predictions are saved. Learning will advance only after the complete next week is verified.')
-    home={'headline':headline,'summary':summary,'counts':counts,'worker':worker,
-          'last_real':{'refresh':last([x for x in store.records('manager_refresh') if x.get('status')=='MANAGER_COMPLETED' and (x.get('last_run') or {}).get('status') in ('NEW','UNCHANGED','PARTIAL')],'Data Manager refresh completed'),'forecast':last(forecasts,'Generated real-input forecasts'),'learning':last(heads,'Settled and learned from a complete week'),'experiment':last(candidates,'Completed a development candidate')},
-          'next':{'label':next_label,'reason':operation.get('next_reason',summary),'period':period},
+    if foundation.get('next_job'):
+        next_label='Next GAMD work'
+        summary_next=foundation['next_job']
+    else:summary_next=operation.get('next_reason',summary)
+    if execution_busy:
+        next_label='Current work is running'
+        summary_next='The current operation is finishing; automatic work remains paused.' if paused else 'Completed results will appear when saved. Existing warnings remain separate.'
+    home={'foundation':foundation,'forward_recovery':{'completed_recoveries':len(recoveries),'recovered_forecasts':sum(r['forecasts'] for r in recoveries)},'headline':headline,'summary':summary,'counts':counts,'worker':worker,
+          'last_real':{'refresh':last([x for x in store.records('manager_refresh') if x.get('status')=='MANAGER_COMPLETED' and (x.get('last_run') or {}).get('status') in ('NEW','UNCHANGED','PARTIAL')],'Data Manager refresh completed'),'forecast':last(forecasts,'Generated real-input forecasts'),'learning':last(heads,'Settled and learned from a complete week'),'experiment':last(candidates,'Completed a V3 paired comparison')},
+          'next':{'label':next_label,'reason':summary_next,'period':period},
           'primary_action':{'label':'Resume research' if paused else 'Refresh and continue','action':'resume' if paused else 'run_ready','payload':{},'enabled':True},
           'performance':{'summary':'Measured forecast performance' if settled else 'Not measured yet',
                          'reason':f'{settled} verified outcomes scored.' if settled else 'Real forecasts need verified outcomes before error and calibration can be measured. Betting returns require genuine offers and settlements.',

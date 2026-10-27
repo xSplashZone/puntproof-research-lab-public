@@ -21,6 +21,34 @@ def public_research(g):
     forward=continuous.get('forward',{});summary=continuous.get('source',{}).get('summary',{})
     return {k:int(g.get(k,0) or 0) for k in ('completed','fitted_artifacts','failed','rejected')}|{'attempts':[],'continuous':{'attempts':attempts,'runtime':{'status':'PUBLIC_SNAPSHOT','next_action':'Read-only capture. Local work continues separately.'},'budget':{},'processes':{'B':continuous.get('processes',{}).get('B')},'forward':{k:forward.get(k) for k in ('status','games','forecasts','targets','exclusions')},'source':{'summary':{k:v for k,v in summary.items() if type(v) in (int,float) or v is None}},'paused':True}}
 
+def public_foundation(value):
+    """Only explicitly named aggregate values; never forward a private report blob."""
+    def numbers(row, keys):
+        return {k: row.get(k) for k in keys if type(row.get(k)) in (int, float) or row.get(k) is None}
+    def basis(row):
+        label = row.get('comparison_basis')
+        return label if label in ('Foundation repaired data', 'Earlier saved result', 'Saved result — dataset shown in evidence') else 'Saved result — dataset shown in evidence'
+    matched = []
+    for row in value.get('matched_F', []):
+        matched.append({k: row.get(k) for k in ('recipe', 'channel', 'status')} | {'comparison_basis': basis(row)} |
+            numbers(row, ('n', 'candidate_mae', 'F_mae', 'delta_mae', 'candidate_crps', 'F_crps')))
+    probability = []
+    for row in value.get('probability_audit', []):
+        all_rows = row.get('all', {})
+        probability.append({'recipe': row.get('recipe'), 'channel': row.get('channel'), 'comparison_basis': basis(row),
+            'all': {'n': all_rows.get('n'), 'events': {event: numbers(all_rows.get('events', {}).get(event, {}),
+                       ('predicted', 'observed', 'brier', 'log_loss', 'zero_likelihood_cases', 'ece'))
+                       for event in ('negative', 'zero', '150plus')}}})
+    health = value.get('dataset_health') or {}
+    return {'canonical_revision': value.get('canonical_revision'), 'source_cutoff': value.get('source_cutoff'),
+            'dataset_health': {'status': health.get('status', 'NO_VERIFIED_HEALTH_REPORT')},
+            'coverage': {k: v for k, v in (value.get('coverage') or {}).items() if type(v) in (int, float)},
+            'matched_F': matched, 'probability_audit': probability,
+            'evidence_warnings': numbers(value.get('evidence_warnings', {}), ('invalid_result_count',)),
+            'probability_status': 'Experimental; calibration and signed/zero/tail mass require review.',
+            'observation': numbers(value.get('observation', {}), ('issued', 'scored', 'pending', 'unknown', 'verified_dnp')),
+            'report_links': {}}
+
 def public_state(state,at):
     counts={key:int(state['home']['counts'].get(key,0)) for key in ('seeds_loaded','source_records_validated','forecasts_generated','forecasts_settled','learning_updates','candidates_tested')}
     totals=[]
@@ -28,9 +56,9 @@ def public_state(state,at):
         totals.append({k:a[k] for k in ('total','eligible','excluded','reasons','cohorts','denominator','input_equivalence') if k in a})
     message='Published investigation snapshot captured '+at+'. This cloud copy does not run the local Python engine or worker.'
     return dict(cloud_mode=True,captured_at=at,
-      home=dict(headline='Public investigation copy',summary=message,counts=counts,
+      home=dict(foundation=public_foundation(state.get('home',{}).get('foundation',{})),headline='Public investigation copy',summary=message,counts=counts,
         worker={'label':'Snapshot only','detail':'The operational V3 engine remains on the owner’s PC. This hosted copy exposes the interface and reviewed source code.'},
-        last_real={},next={'label':'Inspect the public source or test the interface','reason':'This snapshot reports saved completed work at capture. Public source: /source/index.html'},
+        last_real={},next={'label':'Inspect the public source or test the interface','reason':'This snapshot reports saved completed work at capture. Public source: ./source/index.html'},
         primary_action={'label':'Local operations are unavailable in this copy','enabled':False,'reason':'No private engine, data, credentials or control connection is hosted.'},
         performance={'summary':'Not measured yet' if not counts['forecasts_settled'] else 'See private local measured results','reason':'No private forecast, outcome or betting records are publicly redistributed.','metrics':[]}),
       overview={'status':'PUBLIC_READ_ONLY_INVESTIGATION','genuine_roi':'ROI_NOT_ESTABLISHED','production_model':'UNVERIFIED','provider_access':'DISABLED'},
@@ -39,13 +67,25 @@ def public_state(state,at):
       coverage_audits=totals,candidate_decisions=[],forecasts=[],performance=[],experiments=[],experiment_results=[],knowledge=[],knowledge_sources=[],models=[],leaderboard=[],alerts=[],sources=[],integrations=[],packages=[],jobs=[],settings={},receipts=[],bets=[],ledger={'REAL':None,'PAPER':None},runtime={},gamd=public_research(state.get('gamd',{})))
 
 def build(destination,state,at):
+    commit=subprocess.check_output([r'C:\Program Files\Git\cmd\git.exe','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
+    def committed(path):
+        name=path.relative_to(ROOT).as_posix()
+        return subprocess.check_output([r'C:\Program Files\Git\cmd\git.exe','show',commit+':'+name],cwd=ROOT)
     destination=Path(destination);dist=destination/'dist';dist.mkdir(parents=True,exist_ok=True)
-    for name in ('index.html','style.css','app.js'):(dist/name).write_bytes((ROOT/'tools/research_lab/static'/name).read_bytes())
+    snapshot=(json.dumps(public_state(state,at),indent=2,ensure_ascii=False)+'\n').encode('utf-8')
+    snapshot_revision=hashlib.sha256(snapshot).hexdigest()[:16]
+    for name in ('index.html','style.css','app.js'):(dist/name).write_bytes(committed(ROOT/'tools/research_lab/static'/name))
     p=dist/'index.html';s=p.read_text(encoding='utf8').replace('<body>','<body><aside style="padding:12px 24px;background:#173c40;color:#fff">Public read-only investigation copy · <a href="/source/index.html" style="color:#fff">Browse source</a> · <a href="/source/research-lab-source.zip" style="color:#fff">Download code</a> · Snapshot '+html.escape(at)+'</aside>');p.write_text(s,encoding='utf8',newline='\n')
-    p=dist/'app.js';s=p.read_text(encoding='utf8');s=s.replace("async function request(url,options={}){", "async function request(url,options={}){if(url==='/api/state')url='/snapshot.json';")
-    s=s.replace("async function act(action,fields={}){", "async function act(action,fields={}){notice('This public copy is read-only. Inspect /source/index.html; private local operations are unavailable.',false);return null;")
+    p=dist/'app.js';s=p.read_text(encoding='utf8');s=s.replace("async function request(url,options={}){", "async function request(url,options={}){if(url==='/api/state')url='./snapshot.json?v="+snapshot_revision+"';")
+    s=s.replace("async function act(action,fields={}){", "async function act(action,fields={}){notice('This public copy is read-only. Inspect ./source/index.html; private local operations are unavailable.',false);return null;")
     s=s.replace('Connected to your local Lab','Public snapshot — no live local connection');p.write_text(s,encoding='utf8',newline='\n')
-    safe=public_state(state,at);(dist/'snapshot.json').write_text(json.dumps(safe,indent=2,ensure_ascii=False)+'\n',encoding='utf8')
+    index=dist/'index.html';text=index.read_text(encoding='utf8')
+    for asset in ('app.js','style.css'):
+        revision=hashlib.sha256((dist/asset).read_bytes()).hexdigest()[:16]
+        text=text.replace('/'+asset+'\"','./'+asset+'?v='+revision+'\"')
+    text=text.replace('href=\"/source/','href=\"./source/')
+    index.write_text(text,encoding='utf8',newline='\n')
+    (dist/'snapshot.json').write_bytes(snapshot)
     files=sorted((ROOT/'tools/research_lab/gamd').glob('*.py'))+sorted((ROOT/'tools/research_lab').glob('*.py'))+sorted((ROOT/'tools/research_lab/static').glob('*'))
     files += [ROOT/'tools/research_lab/launch.ps1',ROOT/'Open Research Lab.cmd',ROOT/'src/nfl_model/research_lab_gate.py',ROOT/'src/nfl_model/research_lab_pair_gate.py']
     files += [ROOT/'src/nfl_model'/name for name in ('gamd_gate.py','licensed_bdl_gate.py','continuous_gamd_gate.py')]
@@ -54,17 +94,16 @@ def build(destination,state,at):
     source=dist/'source';source.mkdir(exist_ok=True);manifest=[];links=[]
     with zipfile.ZipFile(source/'research-lab-source.zip','w',zipfile.ZIP_DEFLATED) as archive:
         for p in files:
-            name=p.relative_to(ROOT).as_posix();data=p.read_bytes();entry=zipfile.ZipInfo(name,date_time=(2026,10,27,0,0,0));entry.compress_type=zipfile.ZIP_DEFLATED;archive.writestr(entry,data)
+            name=p.relative_to(ROOT).as_posix();data=committed(p);entry=zipfile.ZipInfo(name,date_time=(2026,10,27,0,0,0));entry.compress_type=zipfile.ZIP_DEFLATED;archive.writestr(entry,data)
             target=source/(name+'.txt');target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data)
             manifest.append({'path':name,'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data)})
             links.append('<li><a href="'+html.escape(name)+'.txt">'+html.escape(name)+'</a></li>')
         readme='PuntProof Research Lab public application source. Private engine seeds, football payloads, policy/evidence records, credentials and production configuration are excluded. Existing local install remains authoritative. Public host serves the existing UI with a sanitized aggregate snapshot; it does not run Python/V3. For authored portable arithmetic/persistence tests: PYTHONPATH=tools/research_lab python -m unittest discover -s tests/research_lab -p test_core.py (also test_monitoring.py and test_experiments.py). No package installation is required for those standard-library checks. Full integration requires the existing admitted local repository, supplied engine and pinned isolated runtime. No live betting or improvement claim follows from a test.\n'
         archive.writestr('PUBLIC_README.txt',readme)
     (source/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n',encoding='utf8')
-    commit=subprocess.check_output([r'C:\Program Files\Git\cmd\git.exe','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
-    (source/'export-custody.json').write_text(json.dumps({'private_source_commit':commit,'exported_at':at,'manifest_sha256':hashlib.sha256((source/'manifest.json').read_bytes()).hexdigest(),'private_records_exported':0},indent=2)+'\n',encoding='utf8')
+    (source/'export-custody.json').write_text(json.dumps({'private_source_commit':commit,'canonical_committed_blobs':True,'exported_at':at,'manifest_sha256':hashlib.sha256((source/'manifest.json').read_bytes()).hexdigest(),'private_records_exported':0},indent=2)+'\n',encoding='utf8')
     (source/'README.txt').write_text(readme,encoding='utf8')
-    (source/'index.html').write_text('<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Research Lab public source</title><style>body{font:16px system-ui;max-width:1000px;margin:40px auto;padding:20px;background:#101b22;color:#e6edf3}a{color:#7de1da}li{margin:8px}pre{white-space:pre-wrap}</style><h1>PuntProof Research Lab source</h1><p><a href="/">Open investigation interface</a> · <a href="research-lab-source.zip">Download source ZIP</a> · <a href="manifest.json">SHA-256 inventory</a></p><pre>'+html.escape(readme)+'</pre><ul>'+''.join(links)+'</ul></html>',encoding='utf8')
+    (source/'index.html').write_text('<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Research Lab public source</title><style>body{font:16px system-ui;max-width:1000px;margin:40px auto;padding:20px;background:#101b22;color:#e6edf3}a{color:#7de1da}li{margin:8px}pre{white-space:pre-wrap}</style><h1>PuntProof Research Lab source</h1><p><a href="../">Open investigation interface</a> · <a href="research-lab-source.zip">Download source ZIP</a> · <a href="manifest.json">SHA-256 inventory</a></p><pre>'+html.escape(readme)+'</pre><ul>'+''.join(links)+'</ul></html>',encoding='utf8')
     return {'files':len(files),'source_archive_sha256':hashlib.sha256((source/'research-lab-source.zip').read_bytes()).hexdigest(),'captured_at':at,'private_records_exported':0}
 
 if __name__=='__main__':

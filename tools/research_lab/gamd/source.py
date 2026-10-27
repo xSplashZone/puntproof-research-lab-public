@@ -13,6 +13,7 @@ FIELDS={
  'player_stats':('season','season_type','week','player_id','player_name','player_display_name','position','recent_team','team','opponent_team','targets','receptions','receiving_yards','carries','rushing_yards','attempts','completions',),
  'rosters':('season','season_type','game_type','week','gsis_id','team','position','full_name','status')}
 POSITIONS={'WR','TE','RB','FB'}
+CONTEXT_FIELDS={**FIELDS,'pbp':FIELDS['pbp']+('play_id','game_half','desc','receiving_yards','rushing_yards','lateral_receiving_yards','lateral_rushing_yards','qb_scramble','two_point_attempt')}
 
 def sha(path):
  with Path(path).open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
@@ -22,11 +23,12 @@ def number(v):
  except (ValueError,TypeError):return None
  return x if math.isfinite(x) else None
 
-def read_partition(root,entry,*,years):
+def read_partition(root,entry,*,years,context=False):
  """Authenticate one admitted year file, filter period before projecting fields."""
  dataset=entry['dataset'];year=int(entry['season'])
  if dataset not in FIELDS or year not in years or year==2025:raise ValueError('SOURCE_PARTITION_DENIED')
- if set(entry['allowed_fields'])!=set(FIELDS[dataset]):raise ValueError('SOURCE_FIELD_CONTRACT_CHANGED')
+ fields=(CONTEXT_FIELDS if context else FIELDS)[dataset]
+ if set(entry['allowed_fields'])!=set(fields):raise ValueError('SOURCE_FIELD_CONTRACT_CHANGED')
  root=Path(root).resolve();p=(root/entry['path']).resolve();p.relative_to(root)
  if p.is_symlink() or sha(p)!=entry['sha256']:raise ValueError('SOURCE_BYTES_CHANGED')
  opener=gzip.open if entry.get('format')=='jsonl.gz' else open
@@ -48,7 +50,7 @@ def read_partition(root,entry,*,years):
    if year==2026 and week>entry.get('through_week',6):continue
    # Match the existing Data Manager's null representation in raw historical
    # CSVs. A missing GSIS must never become a shared literal "NA" identity.
-   row={k:(None if raw.get(k) in (None,'','NA','NaN','nan') else raw.get(k)) for k in FIELDS[dataset]}
+   row={k:(None if raw.get(k) in (None,'','NA','NaN','nan') else raw.get(k)) for k in fields}
    types=[row[k] for k in ('season_type','game_type') if row.get(k) is not None]
    if not types:raise ValueError('EXPLICIT_REGULAR_SEASON_TYPE_REQUIRED')
    if any(v!='REG' for v in types):continue

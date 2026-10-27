@@ -1,7 +1,7 @@
 {
-  "private_source_commit": "c88f516b5fffaba6fd729ff0b115f51c321b05e8",
-  "exported_at": "2026-10-27T08:22:58.128782+00:00",
-  "manifest_sha256": "ec6a706db913b4fb5457ebc901160c117ca4f113978cf51fe1bc120084fda947",
-  "private_records_exported": 0,
-  "canonical_committed_blobs": true
+  "private_source_commit": "cdb75fcc21047c4acb06db0dd434b81ea927df55",
+  "canonical_committed_blobs": true,
+  "exported_at": "2026-10-27T22:48:24.3289546+10:00",
+  "manifest_sha256": "0c337e068f75860dbc6284a443243bd31ccbf067fdee40f83c80b8182519cd5e",
+  "private_records_exported": 0
 }

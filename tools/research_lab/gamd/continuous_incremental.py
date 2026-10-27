@@ -16,7 +16,8 @@ def imports(store):
 
 def project(root,store,m,previous,snaps,stats,conflicts):
  from nfl_model import continuous_gamd_gate as g
- from gamd.continuous_source import future_cohort,repair,forward_history
+ from gamd.continuous_source import future_cohort,repair,forward_history,training_context
+ from gamd.continuous_context import reconcile
  from source_adapter import prepare_retained_inputs,instant,_complete
  declared=m.get('manager_imports',[]);current=imports(store)
  if not declared:return None
@@ -32,11 +33,11 @@ def project(root,store,m,previous,snaps,stats,conflicts):
   data[item['dataset']]=rows
  if set(data)!={'schedule','rosters','player_stats','pbp'}:return None
  rosters=[{**r,'_observed_at':r.get('_source',{}).get('observed_at') or next(x['observed_at'] for x in declared if x['dataset']=='rosters'),'_source':r.get('_source',{})} for r in data['rosters']]
- first=future_cohort(data['schedule'],rosters,[],m['as_of'])
- if not first['fixtures']:return None
- week=first['fixtures'][0]['week'];prepared=prepare_retained_inputs(data['schedule'],data['rosters'],data['player_stats'],data['pbp'],cutoff=m['as_of'],target_period=(2026,week),_settlement=True)
- repaired=repair(prepared,previous,snaps,stats,conflicts);history=forward_history(repaired['history'])
+ # Outcomes and canonical history do not depend on a future fixture existing.
+ prepared=prepare_retained_inputs(data['schedule'],data['rosters'],data['player_stats'],data['pbp'],cutoff=m['as_of'],target_period=(2026,19),_settlement=True)
+ repaired=repair(prepared,previous,snaps,stats,conflicts);contexts=reconcile(data,m['as_of'])
+ history=training_context(forward_history(repaired['history']),contexts['contexts'])
  complete={f['game_id'] for f in prepared['schedule'] if _complete(f,instant(m['as_of']))}
  verified=[r for r in history if r['game_id'] in complete]
- cohort=future_cohort(data['schedule'],rosters,history,m['as_of'])
- return {'cohort':cohort,'verified_completed':verified,'completed_games':sorted(complete),'imports':declared}
+ cohort=future_cohort(data['schedule'],rosters,history,m['as_of'],contexts=contexts['contexts'])
+ return {'cohort':cohort,'verified_completed':verified,'completed_games':sorted(complete),'imports':declared,'contexts':contexts['contexts'],'context_evidence':contexts['evidence_samples']}

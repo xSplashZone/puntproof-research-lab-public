@@ -139,13 +139,25 @@ class Application:
         from app_view import owner_state
         from game_shadow import observation_views
         from gamd.forward import status as gamd_forward_status
-        gamd_status = self.gamd.status()
+        from gamd.continuous_settlement import latest_evaluations
+        gamd_status = dict(self.gamd.status())
         gamd_status['coverage'] = [coverage_display_record(record) for record in gamd_status.get('coverage', [])]
         if isinstance(settings.get('gamd_coverage_runtime'), dict):
             settings['gamd_coverage_runtime'] = coverage_display_record(settings['gamd_coverage_runtime'], include_rows=False)
         gamd_status["forward"] = gamd_forward_status(REPO,s)
-        return redact({**owner_state(s,runtime),"overview":overview,"models":models,"leaderboard":comparisons,
-                       "gamd":gamd_status, "continuous_benchmarks":s.records("continuous_benchmark"), "continuous_evaluations":s.records("continuous_evaluation"), "game_observations":observation_views(s,REPO), "forecasts":s.records("forecast"), "coverage_audits":s.records("coverage_audit"), "candidate_decisions":s.records("candidate_decision"), "automation":s.get_setting("automation_status",{}), "ledger":accounting(s.bets()),
+        owner=owner_state(s,runtime,execution_busy=self.worker.run_lock.locked())
+        benchmarks=s.records('continuous_benchmark')
+        continuous=dict(gamd_status.get('continuous') or {})
+        batch=dict(continuous.get('forward') or {})
+        # Counts describe all saved immutable versions, including verified recovery.
+        # The original batch snapshot and its timeout are retained without mutation.
+        continuous['forward']={**batch,'batch_snapshot':batch,
+            'forecasts':sum(len(r.get('forecasts',[])) for r in benchmarks),'seals':len(benchmarks),
+            'games':len({f['identity'][2] for r in benchmarks for f in r.get('forecasts',[]) if len(f.get('identity',[]))>2}),
+            'count_basis':'ALL_SAVED_IMMUTABLE_FORECAST_VERSIONS',**owner['home']['forward_recovery']}
+        gamd_status['continuous']=continuous
+        return redact({**owner,"overview":overview,"models":models,"leaderboard":comparisons,
+                       "gamd":gamd_status, "continuous_benchmarks":benchmarks, "continuous_evaluations":latest_evaluations(s.records("continuous_evaluation")), "continuous_evaluation_history":s.records("continuous_evaluation"), "game_observations":observation_views(s,REPO), "forecasts":s.records("forecast"), "coverage_audits":s.records("coverage_audit"), "candidate_decisions":s.records("candidate_decision"), "automation":s.get_setting("automation_status",{}), "ledger":accounting(s.bets()),
                        "bets":s.bets(),"experiments":s.records("experiment"),"alerts":alerts,
                        "knowledge":s.records("knowledge"),"knowledge_sources":s.records("knowledge_source"),
                        "sources":sources,"integrations":s.records("integration"),"packages":s.records("package"),

@@ -21,6 +21,9 @@ def seal(root,directory,m,witness):
   cp=directory/'canaries'/(defect+'.json');g.write_once(cp,{'status':'PASS','provider_calls':0,'defect_id':defect,'target_seasons':seasons,'witness_class':'CONTINUOUS_ACTION','same_adapter_report':c['adapter_canary']});defects.append({'defect_id':defect,'canary':g.ref(root,cp)})
  ix=g.ref(root,'research/experiment_index.jsonl')
  pre={'schema_version':'nfl-pretask-satisfiability-v1','task_id':m['operation'],'phase':'REAL_EXECUTION','review':{'experiment_index':ix,'consumed_attempts':[ix,g.ref(root,'research/gamd_v1/REGISTRATION_CLOSEOUT.json')],'negative_knowledge':[g.ref(root,'research/puntproof_rebuild_v1/context_repair_v2/REPORT.md')],'closeouts':[g.ref(root,'research/gamd_v1/runtime_v2/ADAPTER_CANARY.json')],'equivalent_work_exists':False,'reuse_only':False,'source_repair_reopens_science':False,'unresolved_question':'Owner-requested individual/context separation, authentic partial-history selection and conditional early-fold calibration; all old negative evidence preserved. Exact linked pre-fit failure recovery is distinguished from a new scientific mechanism.'},'budget':{'max_calls':0,'max_cost_cents':0,'remaining_calls':0,'reserve_calls':0},'predicates':[{'predicate_id':'CONTINUOUS_EXACT_ACTION','mandatory':True,'terminal_outcome_dependency':['CONTINUOUS_OPERATION_COMPLETE'],'required_witness_class':'CONTINUOUS_ACTION','source_artifacts':[{**wr,'seasons':seasons,'witness_class':'CONTINUOUS_ACTION'}],'target_seasons':seasons,'target_population':population(m),'retained_availability':True,'authorised_acquisition':[],'required_authority':['READ_METADATA']+(['MODEL_EXECUTION'] if m['operation']==g.DEVELOPMENT else []),'maximum_calls':0,'maximum_cost_cents':0,'known_defects':defects,'cross_season_provenance':{'inherited_from_seasons':[],'verified_target_seasons':seasons},'equivalent_prior_work_checked':True,'status':'SATISFIABLE_RETAINED'}]}
+ if m['operation']==g.DEVELOPMENT and m.get('candidate',{}).get('foundation_protocol')=='FOUNDATION_FIXED_HGB_PAIR_V1':
+  policy=g.read(root,c['policy'],True);pre['review'].update(equivalent_work_exists=True,reuse_only=False,source_repair_reopens_science=False,unresolved_question='Owner-requested single paired-channel fixed HGB re-evaluation after source/calendar/context repair. Prior negative HGB evidence remains valid for its original data; unchanged estimators, parameters, seed and split. Compare frozen F on identical observations; no blind or prospective claim.')
+  pre['review']['negative_knowledge']+=policy['prior_evidence'];pre['review']['closeouts'].append(policy['foundation_request'])
  g.write_once(directory/'PRETASK.json',pre);m['readiness']=g.ref(root,directory/'READINESS.json');m['pretask_satisfiability']=g.ref(root,directory/'PRETASK.json');g.write_once(mp,m);return g.ref(root,mp)
 
 def source(root,store=None):
@@ -29,10 +32,14 @@ def source(root,store=None):
  from gamd.continuous_incremental import imports
  from core import digest
  imported=imports(store) if store else []
- epoch=g.now()[:10]
- directory=Path(root)/g.PRIVATE/('source-'+digest({'inputs':c['inputs'],'consumer':cr,'manager_imports':imported,'calendar_day':epoch})[:24])
+ when=g.now();cached=store.get_setting('continuous_source',{}).get('receipt') if store else None
+ if cached:
+  previous=g.read(root,cached);mr=previous.get('source_manifest');prior=g.read(root,mr) if mr else {}
+  valid_until=previous.get('cohort_valid_until')
+  same=prior.get('consumer')==cr and prior.get('inputs')==c['inputs'] and prior.get('manager_imports',[])==imported and previous.get('policy')==c['policy']
+  if same and 'cohort_valid_until' in previous and (valid_until is None or g.stamp(when)<g.stamp(valid_until)) and g.stamp(prior['as_of'])<=g.stamp(when):return mr
+ directory=Path(root)/g.PRIVATE/('source-'+digest({'inputs':c['inputs'],'consumer':cr,'manager_imports':imported,'horizon_start':when})[:24])
  mp=directory/'MANIFEST.json'
- when=g.read(root,g.ref(root,mp))['as_of'] if mp.exists() else g.now()
  return seal(root,directory,{'operation':g.SOURCE,'purpose':'FIELD_REPAIR_AND_INDEPENDENT_COHORT','as_of':when,'output':directory.relative_to(root).as_posix(),'inputs':c['inputs'],'manager_imports':imported},{'status':'PASS','records':783,'seasons':[2023,2024,2026],'provider_calls':0,'basis':'HASH_BOUND_RETAINED_CATALOGUE_AND_PRIOR_SOURCE_RECEIPT'})
 def fit(root,candidate,receipt):
  from nfl_model import continuous_gamd_gate as g

@@ -30,6 +30,15 @@ FEATURE_NAMES = (
 )
 
 
+def feature_contract_sha256():
+    """Dataset corrections do not rename or reorder this established vector."""
+    contract = {'schema': SCHEMA, 'features': FEATURE_NAMES,
+                'chronology': 'STRICTLY_EARLIER_SEASON_WEEK',
+                'team_context': 'FULL_RECONCILED_RECEIVING_OR_RBFB_CATEGORY',
+                'yards': 'SIGNED_INTEGER', 'missing': 'NULL_NOT_ZERO'}
+    return hashlib.sha256(json.dumps(contract, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+
+
 def identity(row):
     return tuple(row[k] for k in ('season', 'week', 'game_id', 'gsis', 'team', 'channel'))
 

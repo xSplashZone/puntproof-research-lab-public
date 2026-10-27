@@ -75,15 +75,36 @@ def match(native,game,index):
  found=next(iter(matches.values()));need(type(player.get('id')) is int,'NATIVE_PLAYER_ID_REQUIRED')
  return {**{k:found[k] for k in ('season','week','game_id','gsis','team','position','name')},'native_player_id':player['id'],'native_game_id':game['native_game_id'],'identity_state':'EXACT_DATED_ROSTER_GSIS','birthdate_evidence':None,'match_basis':'UNIQUE_FULL_NAME_POSITION_DATED_TEAM_GAME; native ID consistency checked across all admitted games'}
 
-def snap_values(rows):
- """Full native team-game census BEFORE player mapping; provider percent is distinct."""
- groups=defaultdict(dict);bad=set()
+def snap_values(rows,*,complete_censuses=None):
+ """Individual counts do not establish a complete offensive-player census.
+
+ Optional witnesses must come from an independently authenticated full census,
+ not pagination, a minimum row count or this capture's own list of players.
+ No current retained catalogue supplies one; this pure function grants no
+ source certification. The admitted caller authenticates a witness's source.
+ """
+ groups=defaultdict(dict);bad=set();captures=defaultdict(list)
  for r in rows:
   k=(r['game']['id'],team(r.get('team')));pid=r.get('player',{}).get('id');n=integer(r.get('offense_snaps'))
+  captures[k].append(r)
   if pid is None or n is None or n<0:bad.add(k);continue
   if pid in groups[k] and groups[k][pid]!=n:bad.add(k)
   groups[k][pid]=n
- return {k:{'snap_denominator':max(players.values()),'native_players':len(players),'team_game_complete':k not in bad and max(players.values())>0,'snap_denominator_definition':DEN} for k,players in groups.items()}
+ result={}
+ for k,players in groups.items():
+  witness=(complete_censuses or {}).get(k,{});capture_sha=digest(dump(captures[k]).encode())
+  complete=bool(players) and k not in bad and max(players.values())>0 and (
+   witness.get('basis')=='INDEPENDENT_COMPLETE_OFFENSIVE_PARTICIPANT_CENSUS' and
+   witness.get('capture_sha256')==capture_sha and
+   re.fullmatch('[0-9a-f]{64}',witness.get('source_sha256','')) is not None and
+   witness.get('source_sha256')!=capture_sha and
+   set(witness.get('native_player_ids',[]))==set(players))
+  result[k]={'snap_denominator':max(players.values()) if complete else None,
+   'observed_max_offense_snaps':max(players.values()) if players else None,
+   'native_players':len(players),'team_game_complete':complete,
+   'snap_denominator_definition':DEN,'completeness_basis':witness if complete else None,
+   'capture_sha256':capture_sha,'conflicted_capture':k in bad}
+ return result
 
 def execute(root,mr):
  from nfl_model import licensed_bdl_gate as gate
@@ -144,8 +165,9 @@ def execute(root,mr):
    value={**found,'source':src,'game':games[g['native_game_id']]}
    if ds=='snap_counts':
     den=census.get((g['native_game_id'],found['team']),{});off=integer(raw.get('offense_snaps'))
-    if not den.get('team_game_complete') or off is None or not 0<=off<=den['snap_denominator']:quarantine.append({'identity':list(k),'code':'SNAP_DENOMINATOR_UNVERIFIED'});continue
-    value.update(den,offense_snaps=off,snap_share=off/den['snap_denominator'],provider_offense_snap_pct=raw.get('offense_snap_pct'));target=snaps
+    if off is None or off<0:quarantine.append({'identity':list(k),'code':'INVALID_INDIVIDUAL_SNAP_COUNT'});continue
+    denominator=den.get('snap_denominator')
+    value.update(den,offense_snaps=off,snap_share=off/denominator if denominator and off<=denominator else None,provider_offense_snap_pct=raw.get('offense_snap_pct'));target=snaps
    else:
     value['values']={dst:integer(raw.get(srcfield)) for srcfield,dst in FIELDS.items()};target=stats
    if k in target and {x:v for x,v in value.items() if x!='source'}!={x:v for x,v in target[k].items() if x!='source'}:conflicts.add(k)

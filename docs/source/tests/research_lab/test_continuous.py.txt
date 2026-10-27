@@ -70,6 +70,16 @@ class ContinuousTests(unittest.TestCase):
    store=Store(Path(d));store.append('source_import','authored',{'dataset':'pbp','validation':'ACTUAL_PAYLOAD_READ_AND_HASH_VERIFIED','through_period':[2026,7],'artifact':{'path':'a','sha256':'a'*64},'manifest':{'path':'b','sha256':'b'*64},'source_clock':'2026-10-27T00:00:00Z'},immutable=True)
    self.assertEqual(imports(store)[0]['dataset'],'pbp')
  def test_model_roundtrip(self):
+  # The application and frozen estimator runtime intentionally use different Python versions.
+  try:import joblib
+  except ImportError:
+   import subprocess
+   root=Path(__file__).resolve().parents[2]
+   interpreter=root/'scratch/v3-python/cpython-3.13.17-windows-x86_64-none/python.exe'
+   code="import sys,unittest;sys.path[:0]=['scratch/v3-env/Lib/site-packages','src','tools/research_lab','tests/research_lab'];r=unittest.TextTestRunner().run(unittest.defaultTestLoader.loadTestsFromName('test_continuous.ContinuousTests.test_model_roundtrip'));raise SystemExit(not r.wasSuccessful())"
+   result=subprocess.run([str(interpreter),'-I','-B','-S','-c',code],cwd=root,capture_output=True,text=True)
+   self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+   return
   import numpy as np,joblib,io
   from gamd.trainer import _fit,_predict
   from gamd.continuous_train import calibrate,law_for
