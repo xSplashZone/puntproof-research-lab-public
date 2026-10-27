@@ -16,7 +16,20 @@
       "label": "Snapshot only",
       "detail": "The operational V3 engine remains on the owner’s PC. This hosted copy exposes the interface and reviewed source code."
     },
-    "last_real": {},
+    "last_real": {
+      "refresh": {
+        "summary": "44048 records validated; private event times omitted"
+      },
+      "forecast": {
+        "summary": "161 original forecasts sealed; private records omitted"
+      },
+      "learning": {
+        "summary": "1 completed sequential update; private child states omitted"
+      },
+      "experiment": {
+        "summary": "2 completed V3 comparisons; GAMD listed separately"
+      }
+    },
     "next": {
       "label": "Inspect the public source or test the interface",
       "reason": "This snapshot reports saved completed work at capture. Public source: /source/index.html"
